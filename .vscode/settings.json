@@ -1,0 +1,15 @@
+{
+    "Lua.runtime.version": "LuaJIT",
+    "Lua.diagnostics.globals": [
+        "love"
+    ],
+    "Lua.workspace.library": [
+        "${3rd}/love2d/library"
+    ],
+    "Lua.workspace.checkThirdParty": false,
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#3C282F",
+        "titleBar.activeBackground": "#543842",
+        "titleBar.activeForeground": "#FCFAFA"
+    }
+}
