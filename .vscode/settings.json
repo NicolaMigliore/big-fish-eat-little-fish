@@ -1,7 +1,9 @@
 {
     "Lua.runtime.version": "LuaJIT",
     "Lua.diagnostics.globals": [
-        "love"
+        "love",
+        "wf",
+        "world"
     ],
     "Lua.workspace.library": [
         "${3rd}/love2d/library"
