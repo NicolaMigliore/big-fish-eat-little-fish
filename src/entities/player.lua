@@ -21,8 +21,18 @@ function Player:new(x, y)
             down = { "down", "s" }
         })
 
-    Player.super.new(self, x, y, maxSpeed, spr, { collider = collider, control = control })
-    self.sprite = spr
+    -- define animations
+    local frames = Animation.GetFrames("assets/sprites/fish_01.png", 4, 32, 32, 0, 0)
+    local idleAnimation = Animation("assets/sprites/fish_01.png", frames, 32, 32, 1)
+    local animationController = AnimationController({ idle = idleAnimation }, "idle")
+    
+    local entityOptions = {
+        collider = collider,
+        control = control,
+        animationController = animationController,
+    }
+    Player.super.new(self, x, y, maxSpeed, spr, entityOptions)
+
     self.size = 10
 end
 

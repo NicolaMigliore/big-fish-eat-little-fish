@@ -13,6 +13,8 @@ wf = require "libs.windfield"
 -- load components
 Sprite = require "src.components.sprite"
 Control = require "src.components.control"
+local animComponents = require("src.components.animation")
+Animation, AnimationController = animComponents[1], animComponents[2]
 
 -- load entities
 local Entity = require "src.entities.entity"
@@ -22,6 +24,7 @@ local Player = require "src.entities.player"
 WATER_FRICTION = 10000
 
 local player
+local currentFrame = 1
 
 function love.load()
     world = wf.newWorld(0, 0, true)
@@ -35,6 +38,8 @@ function love.update(dt)
 
     -- update entities
     player:update(dt)
+
+    currentFrame = currentFrame + dt
 end
 
 function love.keyreleased(key)
@@ -45,4 +50,5 @@ function love.draw()
 
     -- draw entities
     player:draw()
+
 end

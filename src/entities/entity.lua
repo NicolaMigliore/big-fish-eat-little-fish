@@ -13,13 +13,32 @@ function Entity:new(x, y, maxSpeed, sprite, options)
     self.sprite = sprite
     self.collider = options.collider
     self.control = options.control
+    self.animationController = options.animationController
+
 end
 
 function Entity:update(dt)
+    -- update animation
+    if self.animationController then
+        local activeAnim = self.animationController.activeAnimation
+        self.animationController.currentFrame = self.animationController.currentFrame + dt * self.animationController.activeAnimation.speed
+        if self.animationController.currentFrame > #activeAnim.frames then self.animationController.currentFrame = 1 end
+    end
 end
 
 function Entity:draw()
-    if self.sprite then
+    -- render animation
+    if self.animationController then 
+        local activeAnim = self.animationController.activeAnimation
+        local frameToDraw = activeAnim.frames[math.floor(self.animationController.currentFrame)]
+        love.graphics.draw(
+            self.sprite.sprite,
+            frameToDraw,
+            self.x - activeAnim.width / 2,
+            self.y - activeAnim.height / 2
+        )
+    -- render single sprite
+    elseif self.sprite then
         love.graphics.draw(
             self.sprite.sprite,
             self.x - self.sprite.width / 2,
