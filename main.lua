@@ -12,9 +12,11 @@ wf = require "libs.windfield"
 
 -- load components
 Sprite = require "src.components.sprite"
-Control = require "src.components.control"
+local controlComponents = require("src.components.control")
+Control, Intention = controlComponents[1], controlComponents[2]
 local animComponents = require("src.components.animation")
 Animation, AnimationController = animComponents[1], animComponents[2]
+State = require "src.components.state"
 
 -- load entities
 local Entity = require "src.entities.entity"

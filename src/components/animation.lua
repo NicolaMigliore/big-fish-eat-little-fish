@@ -1,12 +1,14 @@
 local Animation = Object.extend(Object)
 local AnimationController = Object.extend(Object)
 
-function Animation:new(imagePath, frames, width, height, speed)
+function Animation:new(imagePath, frames, width, height, speed, flipX, flipY)
     self.imagePath = imagePath
     self.frames = frames
     self.width = width or 32
     self.height = height or 32
     self.speed = speed or 1
+    self.flipX = flipX or false
+    self.flipY = flipY or false
 end
 
 function Animation.GetFrames(imagePath, frameCount, frameW, frameH, offsetX, offsetY)
@@ -33,6 +35,10 @@ function AnimationController:new(animations, activeAnimation)
     self.animations = animations
     self.activeAnimation = animations[activeAnimationName]
     self.currentFrame = 1
+end
+
+function AnimationController:setAnimation(newAnimationName)
+    self.activeAnimation = self.animations[newAnimationName]
 end
 
 return { Animation, AnimationController }
