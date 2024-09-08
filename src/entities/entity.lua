@@ -31,7 +31,7 @@ end
 
 function Entity:draw()
     -- render animation
-    if self.animationController and self.position then 
+    if self.animationController and self.animationController.activeAnimation and self.position then 
         local activeAnim = self.animationController.activeAnimation
         local frameToDraw = activeAnim.frames[math.floor(self.animationController.currentFrame)]
         local scaleX = (activeAnim.flipX or self.position.dx < 0) and -1 or 1

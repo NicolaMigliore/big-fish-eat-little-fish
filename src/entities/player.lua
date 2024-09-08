@@ -2,21 +2,18 @@ local Fish = require "src.entities.fish"
 local Player = Fish:extend()
 
 function Player:new(x, y)
-    Player.super.new(self, x,y,"assets/sprites/fish_01.png")
+    Player.super.new(self, x, y, "assets/sprites/fish_01.png")
 
-    self.type = "player"
-    
+    self.type    = "player"
+
     -- configure control
-    self.control  = Control(
+    self.control = Control(
         {
             left = { "left", "a" },
             right = { "right", "d" },
             up = { "up", "w" },
             down = { "down", "s" }
         })
-
-    -- define states
-    self.state = self:createState()
 end
 
 function Player:update(dt)
@@ -73,24 +70,15 @@ end
 function Player:createState()
     local states = {
         idle = function()
-            if self.intention.right then return "swim_right" end
-            if self.intention.left then return "swim_left" end
+            if self.intention.right or self.intention.left then return "swim" end
 
             return "idle"
         end,
-        swim_right = function()
-            if not self.intention.right then
+        swim = function()
+            if not self.intention.right and not self.intention.left then
                 return "idle"
             end
-
-            return "swim_right"
-        end,
-        swim_left = function()
-            if not self.intention.left then
-                return "idle"
-            end
-
-            return "swim_left"
+            return "swim"
         end,
     }
     local state = State(states, "idle")

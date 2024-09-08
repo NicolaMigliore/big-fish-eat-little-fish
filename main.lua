@@ -20,11 +20,12 @@ Animation, AnimationController = animComponents[1], animComponents[2]
 State = require "src.components.state"
 
 -- load entities
-local Player = require "src.entities.player"
 local Fish = require "src.entities.fish"
+local Player = require "src.entities.player"
+local Enemy = require "src.entities.enemy"
 
 -- Define global settings
-WATER_FRICTION = 10000
+WORLD_WIDTH, WORLD_HEIGHT = 1020, 2000
 
 local bgImage
 local player
@@ -44,7 +45,7 @@ function love.load()
     bgImage:setWrap("repeat","clamp")
 
     player = Player(200, 200)
-    f1 = Fish(300,300,"assets/sprites/fish_01.png")
+    f1 = Enemy(300,300,"assets/sprites/fish_01.png")
 end
 
 function love.update(dt)
@@ -79,10 +80,10 @@ end
 function loadWorld()
     world = wf.newWorld(0, 0, true)
     local worldBounds = {
-        top = world:newRectangleCollider(-10, -10, 1020, 10),
-        right = world:newRectangleCollider(1000, 0, 10, 2000),
-        bottom = world:newRectangleCollider(-10, 2000, 1020, 10),
-        left = world:newRectangleCollider(-10, 0, 10, 2000),
+        top = world:newRectangleCollider(-10, -10, WORLD_WIDTH, 10),
+        right = world:newRectangleCollider(WORLD_WIDTH - 10, 0, 10, WORLD_HEIGHT),
+        bottom = world:newRectangleCollider(-10, WORLD_HEIGHT, WORLD_WIDTH, 10),
+        left = world:newRectangleCollider(-10, 0, 10, WORLD_HEIGHT),
     }
 
     for key, collider in pairs(worldBounds) do

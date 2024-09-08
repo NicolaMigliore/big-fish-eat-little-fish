@@ -1,7 +1,7 @@
 local Entity = require "src.entities.entity"
 local Fish = Entity:extend()
 
-function Fish:new(x,y, spriteFileName)
+function Fish:new(x, y, spriteFileName)
     self.maxSpeed = 500
     self.strength = 20000
     self.size = 10
@@ -20,6 +20,9 @@ function Fish:new(x,y, spriteFileName)
     -- define animations
     local animationController = self:createAnimationController(spr)
 
+    -- define states
+    local state = self:createState()
+
     local position = Position(x, y)
     local entityOptions = {
         position = position,
@@ -27,7 +30,7 @@ function Fish:new(x,y, spriteFileName)
         -- control = control,
         intention = intention,
         animationController = animationController,
-        -- state = state,
+        state = state,
     }
     Fish.super.new(self, "fish", spr, entityOptions)
 end
@@ -43,27 +46,18 @@ end
 
 function Fish:draw()
     Fish.super.draw(self)
-
-    local vx, vy = self.collider:getLinearVelocity()
-    love.graphics.print(vx..","..vy, self.position.x - 16, self.position.y - 36)
-end
-
-function Fish:fishControl()
-
-    -- set intentions
-    self.intention:setIntentions({
-        left = love.keyboard.isDown("left"),
-        right = love.keyboard.isDown("right"),
-        up = love.keyboard.isDown("up"),
-        down = love.keyboard.isDown("down")
-    })
-
+    love.graphics.print(self.state.current, self.position.x - 16, self.position.y - 36)
 end
 
 function Fish:createAnimationController(spr)
     --idle
     local idleFrames = Animation.GetFrames(spr.image, 4, 32, 32, 0, 0)
     local idleAnimation = Animation(spr.image, idleFrames, 32, 32, 1)
+    --seek
+    local seekAnimation = Animation(spr.image, idleFrames, 32, 32, 1)
+    -- swim_right
+    local swimFrames = Animation.GetFrames(spr.image, 4, 32, 32, 0, 68)
+    local swimAnimation = Animation(spr.image, swimFrames, 32, 32, 1, false, false)
     -- swim_right
     local swim_rightFrames = Animation.GetFrames(spr.image, 4, 32, 32, 0, 68)
     local swim_rightAnimation = Animation(spr.image, swim_rightFrames, 32, 32, 1, false, false)
@@ -71,27 +65,18 @@ function Fish:createAnimationController(spr)
     local swim_leftFrames = Animation.GetFrames(spr.image, 4, 32, 32, 0, 68)
     local swim_leftAnimation = Animation(spr.image, swim_leftFrames, 32, 32, 1, true, false)
 
-    local animationController = AnimationController(
-    { idle = idleAnimation, swim_right = swim_rightAnimation, swim_left = swim_leftAnimation }, "idle")
+    local animationController = AnimationController({
+        idle = idleAnimation,
+        swim = swimAnimation,
+        swim_right = swim_rightAnimation,
+        swim_left = swim_leftAnimation,
+        seek = seekAnimation,
+    }, "idle")
     return animationController
 end
 
-
 function Fish:createState()
-    local states = {
-        idle = function()
-
-        end,
-        seek = function()
-
-        end,
-        swim = function()
-
-        end,
-    }
-    local state = State(states, "idle")
-    return state
+    return State({}, "idle")
 end
-
 
 return Fish
