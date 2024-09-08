@@ -11,8 +11,7 @@ function Animation:new(imagePath, frames, width, height, speed, flipX, flipY)
     self.flipY = flipY or false
 end
 
-function Animation.GetFrames(imagePath, frameCount, frameW, frameH, offsetX, offsetY)
-    local image = love.graphics.newImage(imagePath)
+function Animation.GetFrames(image, frameCount, frameW, frameH, offsetX, offsetY)
     local frames = {}
     offsetX = offsetX or 0
     offsetY = offsetY or 0

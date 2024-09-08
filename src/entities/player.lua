@@ -23,7 +23,7 @@ function Player:new(x, y)
     local intention = Intention()
 
     -- define animations
-    local animationController = self:createAnimationController()
+    local animationController = self:createAnimationController(spr)
 
     -- define states
     local state = self:createState()
@@ -102,17 +102,17 @@ function Player:playerControl()
     self.collider:applyForce(friction.x * WATER_FRICTION, friction.y * WATER_FRICTION)
 end
 
-function Player:createAnimationController()
-    local spritesFileName = "assets/sprites/fish_01.png"
+function Player:createAnimationController(spr)
+    --local spritesFileName = "assets/sprites/fish_01.png"
     --idle
-    local idleFrames = Animation.GetFrames(spritesFileName, 4, 32, 32, 0, 0)
-    local idleAnimation = Animation(spritesFileName, idleFrames, 32, 32, 1)
+    local idleFrames = Animation.GetFrames(spr.image, 4, 32, 32, 0, 0)
+    local idleAnimation = Animation(spr.image, idleFrames, 32, 32, 1)
     -- swim_right
-    local swim_rightFrames = Animation.GetFrames(spritesFileName, 4, 32, 32, 0, 68)
-    local swim_rightAnimation = Animation(spritesFileName, swim_rightFrames, 32, 32, 1, false, false)
+    local swim_rightFrames = Animation.GetFrames(spr.image, 4, 32, 32, 0, 68)
+    local swim_rightAnimation = Animation(spr.image, swim_rightFrames, 32, 32, 1, false, false)
     -- swim_left
-    local swim_leftFrames = Animation.GetFrames(spritesFileName, 4, 32, 32, 0, 68)
-    local swim_leftAnimation = Animation(spritesFileName, swim_leftFrames, 32, 32, 1, true, false)
+    local swim_leftFrames = Animation.GetFrames(spr.image, 4, 32, 32, 0, 68)
+    local swim_leftAnimation = Animation(spr.image, swim_leftFrames, 32, 32, 1, true, false)
 
     local animationController = AnimationController(
     { idle = idleAnimation, swim_right = swim_rightAnimation, swim_left = swim_leftAnimation }, "idle")

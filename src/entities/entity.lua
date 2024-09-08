@@ -38,7 +38,7 @@ function Entity:draw()
         local scaleX = (activeAnim.flipX or self.position.dx < 0) and -1 or 1
         local scaleY = activeAnim.flipY and -1 or 1
         love.graphics.draw(
-            self.sprite.sprite,
+            self.sprite.image,
             frameToDraw,
             self.position.x - activeAnim.width / 2,
             self.position.y - activeAnim.height / 2,
@@ -51,7 +51,7 @@ function Entity:draw()
     -- render single sprite
     elseif self.sprite and self.position then
         love.graphics.draw(
-            self.sprite.sprite,
+            self.sprite.image,
             self.position.x - self.sprite.width / 2,
             self.position.y - self.sprite.height / 2
         )
