@@ -1,7 +1,7 @@
 local Entity = require "src.entities.entity"
 local Player = Entity:extend()
 
-local maxSpeed = 100
+local maxSpeed = 500
 local strength = 20000
 
 function Player:new(x, y)
@@ -28,14 +28,16 @@ function Player:new(x, y)
     -- define states
     local state = self:createState()
 
+    local position = Position(x, y)
     local entityOptions = {
+        position = position,
         collider = collider,
         control = control,
         intention = intention,
         animationController = animationController,
         state = state
     }
-    Player.super.new(self, x, y, maxSpeed, spr, entityOptions)
+    Player.super.new(self, maxSpeed, spr, entityOptions)
 
     self.size = 10
 end
@@ -45,14 +47,15 @@ function Player:update(dt)
 
     self:playerControl()
 
-    self.x = self.collider:getX() + self.animationController.activeAnimation.width / 2
-    self.y = self.collider:getY() + self.animationController.activeAnimation.height / 2
+    self.position.x = self.collider:getX() + self.animationController.activeAnimation.width / 2
+    self.position.y = self.collider:getY() + self.animationController.activeAnimation.height / 2
 end
 
 function Player:draw()
     self.super.draw(self)
 
-    love.graphics.print(self.intention:__tostring(), 10, 10)
+    love.graphics.print(self.position.dx, 10, 10)
+    love.graphics.print(self.position.dy, 10, 20)
 end
 
 function Player:playerControl()
@@ -77,6 +80,18 @@ function Player:playerControl()
     direction = Utils.normalizeVector2(direction.x, direction.y)
     self.collider:applyForce(strength * direction.x, strength * direction.y)
 
+    -- set player direction
+    if direction.x > 0 then
+        self.position.dx = 1
+    elseif direction.x < 0 then
+        self.position.dx = -1
+    end
+    if direction.y > 0 then
+        self.position.dy = 1
+    elseif direction.y < 0 then
+        self.position.dy = -1
+    end
+
     -- decellerate
     if not self.intention.left and vx < 0 then friction.x = friction.x + 1 end
     if not self.intention.right and vx > 0 then friction.x = friction.x - 1 end
@@ -99,7 +114,8 @@ function Player:createAnimationController()
     local swim_leftFrames = Animation.GetFrames(spritesFileName, 4, 32, 32, 0, 68)
     local swim_leftAnimation = Animation(spritesFileName, swim_leftFrames, 32, 32, 1, true, false)
 
-    local animationController = AnimationController({ idle = idleAnimation, swim_right = swim_rightAnimation, swim_left = swim_leftAnimation }, "idle")
+    local animationController = AnimationController(
+    { idle = idleAnimation, swim_right = swim_rightAnimation, swim_left = swim_leftAnimation }, "idle")
     return animationController
 end
 
