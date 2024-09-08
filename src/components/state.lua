@@ -6,20 +6,25 @@ function State:new(states, current)
     self.current = current or"idle"
 end
 
-function State:update()
+function State:update(entity)
     -- run the current state function
     local stateFunction = self.states[self.current]
     if stateFunction then
         local newState = stateFunction(self)
         if newState ~= self.current then
-            self:setState(newState)
+            self:setState(newState, entity)
         end
     end
 end
 
-function State:setState(newState)
+function State:setState(newState, entity)
     self.previous = self.current
     self.current = newState
+
+    -- set new animation
+    if entity.animationController then
+        entity.animationController:setAnimation(newState)
+    end
 end
 
 return State

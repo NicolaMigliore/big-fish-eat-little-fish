@@ -21,6 +21,7 @@ State = require "src.components.state"
 
 -- load entities
 local Player = require "src.entities.player"
+local Fish = require "src.entities.fish"
 
 -- Define global settings
 WATER_FRICTION = 10000
@@ -43,6 +44,7 @@ function love.load()
     bgImage:setWrap("repeat","clamp")
 
     player = Player(200, 200)
+    f1 = Fish(300,300,"assets/sprites/fish_01.png")
 end
 
 function love.update(dt)
@@ -50,6 +52,7 @@ function love.update(dt)
 
     -- update entities
     player:update(dt)
+    f1:update(dt)
 
     currentFrame = currentFrame + dt
 
@@ -69,6 +72,7 @@ function love.draw()
 
     -- draw entities
     player:draw()
+    f1:draw()
     camera:detach()
 end
 

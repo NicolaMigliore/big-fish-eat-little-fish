@@ -1,12 +1,11 @@
 local Entity = Object.extend(Object)
 
 --- New Entity Constructor
----@param maxSpeed number entity max speed
 ---@diagnostic disable-next-line: undefined-doc-name
 ---@param sprite Sprite entity sprite data
 ---@param options table table of components to add to the entity
-function Entity:new(maxSpeed, sprite, options)
-    self.maxSpeed = maxSpeed
+function Entity:new(type, sprite, options)
+    self.type = type
     self.sprite = sprite
     self.position = options.position
     self.collider = options.collider
@@ -26,7 +25,7 @@ function Entity:update(dt)
 
     -- update state
     if self.state then
-        self.state:update()
+        self.state:update(self)
     end
 end
 
@@ -40,8 +39,8 @@ function Entity:draw()
         love.graphics.draw(
             self.sprite.image,
             frameToDraw,
-            self.position.x - activeAnim.width / 2,
-            self.position.y - activeAnim.height / 2,
+            self.position.x,
+            self.position.y,
             nil,
             scaleX,
             scaleY,

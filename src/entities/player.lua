@@ -1,67 +1,44 @@
-local Entity = require "src.entities.entity"
-local Player = Entity:extend()
-
-local maxSpeed = 500
-local strength = 20000
+local Fish = require "src.entities.fish"
+local Player = Fish:extend()
 
 function Player:new(x, y)
-    local spr = Sprite("assets/sprites/fish_01.png")
+    Player.super.new(self, x,y,"assets/sprites/fish_01.png")
 
-    -- configure collider
-    local collider = world:newRectangleCollider(x - 16, y - 16, 32, 32)
-    collider:setFixedRotation(true)
-    collider:setMass(100)
-
+    self.type = "player"
+    
     -- configure control
-    local control = Control(
+    self.control  = Control(
         {
             left = { "left", "a" },
             right = { "right", "d" },
             up = { "up", "w" },
             down = { "down", "s" }
         })
-    local intention = Intention()
-
-    -- define animations
-    local animationController = self:createAnimationController(spr)
 
     -- define states
-    local state = self:createState()
-
-    local position = Position(x, y)
-    local entityOptions = {
-        position = position,
-        collider = collider,
-        control = control,
-        intention = intention,
-        animationController = animationController,
-        state = state
-    }
-    Player.super.new(self, maxSpeed, spr, entityOptions)
-
-    self.size = 10
+    self.state = self:createState()
 end
 
 function Player:update(dt)
-    self.super.update(self, dt)
+    Player.super.update(self, dt)
 
-    self:playerControl()
+    self:fishControl()
 
-    self.position.x = self.collider:getX() + self.animationController.activeAnimation.width / 2
-    self.position.y = self.collider:getY() + self.animationController.activeAnimation.height / 2
+    self.position.x = self.collider:getX()
+    self.position.y = self.collider:getY()
 end
 
 function Player:draw()
-    self.super.draw(self)
+    Player.super.draw(self)
 
     love.graphics.print(self.position.dx, 10, 10)
     love.graphics.print(self.position.dy, 10, 20)
+    love.graphics.print(self.type, 10, 30)
 end
 
-function Player:playerControl()
+function Player:fishControl()
     local vx, vy = self.collider:getLinearVelocity()
     local direction = { x = 0, y = 0 }
-    local friction = { x = 0, y = 0 }
 
     -- set player intentions
     self.intention:setIntentions({
@@ -78,7 +55,7 @@ function Player:playerControl()
     if self.intention.down and vy < self.maxSpeed then direction.y = direction.y + 1 end
 
     direction = Utils.normalizeVector2(direction.x, direction.y)
-    self.collider:applyForce(strength * direction.x, strength * direction.y)
+    self.collider:applyForce(self.strength * direction.x, self.strength * direction.y)
 
     -- set player direction
     if direction.x > 0 then
@@ -91,48 +68,17 @@ function Player:playerControl()
     elseif direction.y < 0 then
         self.position.dy = -1
     end
-
-    -- decellerate
-    if not self.intention.left and vx < 0 then friction.x = friction.x + 1 end
-    if not self.intention.right and vx > 0 then friction.x = friction.x - 1 end
-    if not self.intention.up and vy < 0 then friction.y = friction.y + 1 end
-    if not self.intention.down and vy > 0 then friction.y = friction.y - 1 end
-
-    friction = Utils.normalizeVector2(friction.x, friction.y)
-    self.collider:applyForce(friction.x * WATER_FRICTION, friction.y * WATER_FRICTION)
-end
-
-function Player:createAnimationController(spr)
-    --local spritesFileName = "assets/sprites/fish_01.png"
-    --idle
-    local idleFrames = Animation.GetFrames(spr.image, 4, 32, 32, 0, 0)
-    local idleAnimation = Animation(spr.image, idleFrames, 32, 32, 1)
-    -- swim_right
-    local swim_rightFrames = Animation.GetFrames(spr.image, 4, 32, 32, 0, 68)
-    local swim_rightAnimation = Animation(spr.image, swim_rightFrames, 32, 32, 1, false, false)
-    -- swim_left
-    local swim_leftFrames = Animation.GetFrames(spr.image, 4, 32, 32, 0, 68)
-    local swim_leftAnimation = Animation(spr.image, swim_leftFrames, 32, 32, 1, true, false)
-
-    local animationController = AnimationController(
-    { idle = idleAnimation, swim_right = swim_rightAnimation, swim_left = swim_leftAnimation }, "idle")
-    return animationController
 end
 
 function Player:createState()
     local states = {
         idle = function()
-            -- set animation
-            if self.state.current ~= self.state.previous then self.animationController:setAnimation("idle") end
             if self.intention.right then return "swim_right" end
             if self.intention.left then return "swim_left" end
 
             return "idle"
         end,
         swim_right = function()
-            -- set animation
-            if self.state.current ~= self.state.previous then self.animationController:setAnimation("swim_right") end
-
             if not self.intention.right then
                 return "idle"
             end
@@ -140,9 +86,6 @@ function Player:createState()
             return "swim_right"
         end,
         swim_left = function()
-            -- set animation
-            if self.state.current ~= self.state.previous then self.animationController:setAnimation("swim_left") end
-
             if not self.intention.left then
                 return "idle"
             end
