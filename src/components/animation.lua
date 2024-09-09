@@ -37,7 +37,10 @@ function AnimationController:new(animations, activeAnimation)
 end
 
 function AnimationController:setAnimation(newAnimationName)
-    self.activeAnimation = self.animations[newAnimationName]
+    local newAnimation = self.animations[newAnimationName]
+    if newAnimation ~= nil then
+        self.activeAnimation = self.animations[newAnimationName]
+    end
 end
 
 return { Animation, AnimationController }

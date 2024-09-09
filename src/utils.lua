@@ -66,4 +66,16 @@ function Utils.normalizeVector2(vx, vy)
     return { x = normalizedX, y = normalizedY }
 end
 
+--- Check if a table (as a list) contains a given vlaue
+--- @param table table The table to check
+--- @param value any The value to find
+function Utils.tableContains(table, value)
+    for i = 1, #table do
+        if (table[i] == value) then
+            return true
+        end
+    end
+    return false
+end
+
 return Utils

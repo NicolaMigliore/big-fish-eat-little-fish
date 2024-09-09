@@ -2,9 +2,10 @@ local Fish = require "src.entities.fish"
 local Player = Fish:extend()
 
 function Player:new(x, y)
-    Player.super.new(self, x, y, "assets/sprites/fish_01.png")
+    Player.super.new(self, x, y, 10, "assets/sprites/fish_01.png")
 
     self.type    = "player"
+    self.collider:setCollisionClass("Player")
 
     -- configure control
     self.control = Control(

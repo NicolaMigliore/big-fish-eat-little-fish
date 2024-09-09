@@ -11,9 +11,7 @@ function State:update(entity)
     local stateFunction = self.states[self.current]
     if stateFunction then
         local newState = stateFunction(self)
-        if newState ~= self.current then
             self:setState(newState, entity)
-        end
     end
 end
 

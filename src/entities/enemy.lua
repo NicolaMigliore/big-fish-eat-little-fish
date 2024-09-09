@@ -1,35 +1,101 @@
 local Fish = require "src.entities.fish"
 local Enemy = Fish:extend()
 
-function Enemy:new(x, y)
-    Enemy.super.new(self, x, y, "assets/sprites/fish_01.png")
+local scanTime = 3
+local memoryTime = 1
+
+function Enemy:new(x, y, size)
+    Enemy.super.new(self, x, y, size, "assets/sprites/fish_01.png")
     self.type = "enemy"
 
     -- seek timer
-    self.seekTimer = 10
+    self.scanTimer = math.random(0.3)
+    self.memoryTimer = 0
     self.target = { x = self.position.x, y = self.position.y }
+    self.predator = nil
+    self.prey = nil
 end
 
 function Enemy:update(dt)
     Enemy.super.update(self, dt)
-    self.seekTimer = self.seekTimer - dt
+    local scanDistance = 100 + 5 * self.size
+
+    -- cleare predator
+    if self.predator ~= nil and Utils.pointDistance(self.position.x, self.position.y, self.predator.position.x, self.predator.position.y) > scanDistance then
+        if self.memoryTimer > 0 then
+            self.memoryTimer = self.memoryTimer - dt
+        else
+            self.predator = nil
+        end
+    end
+    -- clear prey
+    if self.prey ~= nil and Utils.pointDistance(self.position.x, self.position.y, self.prey.position.x, self.prey.position.y) > scanDistance then
+        if self.memoryTimer > 0 then
+            self.memoryTimer = self.memoryTimer - dt
+        else
+            self.prey = nil
+        end
+    end
+
+    -- spot predator and prey
+    if self.predator == nil or self.prey == nil then
+        local colliders = world:queryCircleArea(self.position.x, self.position.y, scanDistance)
+        for _, collider in ipairs(colliders) do
+            local isFish = collider.collision_class == "Fish" --or collider.collision_class == "Player"
+            if isFish then
+                local entity = collider:getObject()
+                local isOther = entity ~= self
+                local sizeDelta = self.size - entity.size
+                -- spot predator
+                if self.predator == nil and isOther and sizeDelta < 5 then
+                    self.predator = entity
+                    self.memoryTimer = memoryTime
+                end
+                -- spot prey
+                if self.prey == nil and isOther and sizeDelta >= 5 then
+                    self.prey = entity
+                    self.memoryTimer = memoryTime
+                end
+            end
+        end
+    end
+
+    if Utils.tableContains({ "idle", "wander"}, self.state.current) and math.random() >.7 then
+        self.scanTimer = self.scanTimer - dt
+        if self.scanTimer < 0 then
+            self.scanTimer = scanTime
+        end
+    end
 end
 
 function Enemy:draw()
     Enemy.super.draw(self)
-    love.graphics.print(self.seekTimer, self.position.x - 16, self.position.y - 106)
+    -- love.graphics.print(self.scanTimer, self.position.x - 16, self.position.y - 106)
 
-    love.graphics.setColor(.7, .7, .2)
-    love.graphics.circle("fill", self.target.x, self.target.y, 5)
-    love.graphics.setColor(1, 1, 1)
+    -- draw target line
+    love.graphics.line(self.position.x, self.position.y, self.target.x, self.target.y)
+
+    -- draw predator line
+    if self.predator ~= nil then
+        love.graphics.setColor(0.7, 0.2, 0.2)
+        love.graphics.line(self.position.x, self.position.y, self.predator.position.x, self.predator.position.y)
+        love.graphics.setColor(1, 1, 1)
+    end
+
+    -- draw prey line
+    if self.prey ~= nil then
+        love.graphics.setColor(0.2, 0.7, 0.2)
+        love.graphics.line(self.position.x, self.position.y, self.prey.position.x, self.prey.position.y)
+        love.graphics.setColor(1, 1, 1)
+    end
+
+    love.graphics.print(tostring(self.state.current)..math.floor(self.memoryTimer), self.position.x - 16, self.position.y - 26)
 end
 
 function Enemy:fishControl()
-    local vx, vy = self.collider:getLinearVelocity()
-    local direction = { x = 0, y = 0 }
     local intentionU, intentionR, intentionD, intentionL = false, false, false, false
 
-    if self.state.current == "swim" then
+    if Utils.tableContains({ "swim", "flee", "hunt", "wander" }, self.state.current) then
         intentionU = self.target.y < self.position.y
         intentionR = self.target.x > self.position.x
         intentionD = self.target.y > self.position.y
@@ -45,6 +111,8 @@ function Enemy:fishControl()
     })
 
     -- accellerate
+    local vx, vy = self.collider:getLinearVelocity()
+    local direction = { x = 0, y = 0 }
     if self.intention.left and vx > -self.maxSpeed then direction.x = direction.x - 1 end
     if self.intention.right and vx < self.maxSpeed then direction.x = direction.x + 1 end
     if self.intention.up and vy > -self.maxSpeed then direction.y = direction.y - 1 end
@@ -69,37 +137,53 @@ end
 function Enemy:createState()
     local states = {
         idle = function()
-            -- reach target
-            local targetDistance = Utils.pointDistance(self.position.x, self.position.y, self.target.x, self.target.y)
-            if targetDistance > 10 then
-                return "swim"
+            if self.predator ~= nil then
+                return "flee"
+            end
+            if self.prey ~= nil then
+                return "hunt"
             end
 
-            -- seek for new position
-            if self.seekTimer < 0 then
-                local shouldSeek = math.random() > 0.3
-                if shouldSeek then
-                    return "seek"
-                end
+            if self.scanTimer < 1 then
+                return "wander"
             end
-
 
             return "idle"
         end,
-        seek = function()
+        flee = function()
             self.target = self:getNewTarget()
-            return "idle"
-        end,
-        swim = function()
-            -- stop swimming if target was reached
-            local targetDistance = Utils.pointDistance(self.position.x, self.position.y, self.target.x, self.target.y)
-            if targetDistance <= 10 then
-                self.seekTimer = 5
+            if self.predator == nil then
                 return "idle"
             end
-            return "swim"
+            return "flee"
         end,
         hunt = function()
+            self.target = self:getNewTarget()
+
+            if self.prey == nil then
+                return "idle"
+            end
+            return "hunt"
+        end,
+        wander = function()
+            if self.state.previous == "idle" then
+                self.target = self:getNewTarget()
+            end
+
+            -- check for predators and preys
+            if self.predator ~= nil then
+                return "flee"
+            end
+            if self.prey ~= nil then
+                return "hunt"
+            end
+            if Utils.pointDistance(self.position.x, self.position.y, self.target.x, self.target.y) < 10 then
+                return "idle"
+            end
+
+            return "wander"
+        end,
+        attack = function()
 
         end,
     }
@@ -107,24 +191,51 @@ function Enemy:createState()
     return state
 end
 
+-- #region player control
 function Enemy:getNewTarget()
     local borderPadding = 40
     local xOffset = 0
     local yOffset = 0
+    local tx, ty = self.position.x, self.position.y
 
-    -- Ensure that fish in the edges of the screen will go toward the middle
-    if self.position.x < WORLD_WIDTH / 5 then xOffset = WORLD_WIDTH / 5 end
-    if self.position.x > WORLD_WIDTH / 5 * 4 then xOffset = - WORLD_WIDTH / 5 end
-    if self.position.y < WORLD_HEIGHT / 50 then yOffset = WORLD_HEIGHT / 50 end
-    if self.position.y > WORLD_HEIGHT / 50 * 49 then yOffset = - WORLD_HEIGHT / 5 end
+    if self.state.current == "flee" and self.predator ~= nil then
+        local dx = self.position.x - self.predator.position.x
+        local dy = self.position.y - self.predator.position.y
+        local direction = Utils.normalizeVector2(dx, dy)
 
-    local rndX = math.random(-500, 500)
-    local rndY = math.random(-20, 40)
-    local tx = math.max(borderPadding, math.min(self.target.x + rndX, WORLD_WIDTH - borderPadding))
-    local ty = math.max(borderPadding, math.min(self.target.y + rndY, WORLD_HEIGHT - borderPadding))
+        tx = self.position.x + direction.x * 200
+        ty = self.position.y + direction.y * 200
 
-    local ret = { x = tx + xOffset, y = ty + yOffset }
-    return ret
+        -- invert direction if reaching world edges
+        if tx > WORLD_WIDTH - borderPadding or tx < borderPadding then
+            tx = self.position.x + direction.x * 200 * -1
+        end
+        if ty > WORLD_HEIGHT - borderPadding or ty < borderPadding then
+            ty = self.position.y + direction.y * 200 * -1
+        end
+        return { x = tx + xOffset, y = ty + yOffset }
+    end
+
+    if self.state.current == "hunt" and self.prey ~= nil then
+        tx = self.prey.position.x
+        ty = self.prey.position.y
+        return { x = tx + xOffset, y = ty + yOffset }
+    end
+
+    if self.state.current == "wander" then
+        -- Ensure that fish in the edges of the screen will go toward the middle
+        if self.position.x < WORLD_WIDTH / 5 then xOffset = WORLD_WIDTH / 5 end
+        if self.position.x > WORLD_WIDTH / 5 * 4 then xOffset = -WORLD_WIDTH / 5 end
+        if self.position.y < WORLD_HEIGHT / 50 then yOffset = WORLD_HEIGHT / 50 end
+        if self.position.y > WORLD_HEIGHT / 50 * 49 then yOffset = -WORLD_HEIGHT / 5 end
+
+        local rndX = math.random(-500, 500)
+        local rndY = math.random(-50, 140)
+        tx = math.max(borderPadding, math.min(self.target.x + rndX, WORLD_WIDTH - borderPadding))
+        ty = math.max(borderPadding, math.min(self.target.y + rndY, WORLD_HEIGHT - borderPadding))
+        return { x = tx + xOffset, y = ty + yOffset }
+    end
+    return { x = tx, y = ty }
 end
 
 return Enemy

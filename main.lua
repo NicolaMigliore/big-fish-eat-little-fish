@@ -24,8 +24,9 @@ local Fish = require "src.entities.fish"
 local Player = require "src.entities.player"
 local Enemy = require "src.entities.enemy"
 
--- Define global settings
+-- Define global objects
 WORLD_WIDTH, WORLD_HEIGHT = 1020, 2000
+ENTITIES = {}
 
 local bgImage
 local player
@@ -38,22 +39,33 @@ function love.load()
     loadWorld()
 
     -- world:setGravity(0, 10)
-    camera = Camera(0, 0, 2)
+    camera = Camera(0, 0, 1)
 
     -- configure background
     bgImage = love.graphics.newImage("assets/background.png")
-    bgImage:setWrap("repeat","clamp")
+    bgImage:setWrap("repeat", "clamp")
 
     player = Player(200, 200)
-    f1 = Enemy(300,300,"assets/sprites/fish_01.png")
+    table.insert(ENTITIES, player)
+    for i = 1, 5, 1 do
+        -- local tmpEnemy = Enemy(math.random(40, WORLD_WIDTH - 40), 100 + i * math.random(50), "assets/sprites/fish_01.png")
+        local tmpEnemy = Enemy(250, 250 + i * math.random(50), math.floor(math.random(30)), "assets/sprites/fish_01.png")
+        table.insert(ENTITIES, tmpEnemy)
+    end
+
+    -- local tmpEnemy = Enemy(250, 250, 10, "assets/sprites/fish_01.png")
+    -- table.insert(ENTITIES, tmpEnemy)
+    -- local tmpEnemy = Enemy(250, 300, 5, "assets/sprites/fish_01.png")
+    -- table.insert(ENTITIES, tmpEnemy)
 end
 
 function love.update(dt)
     world:update(dt)
 
     -- update entities
-    player:update(dt)
-    f1:update(dt)
+    for index, entity in ipairs(ENTITIES) do
+        entity:update(dt)
+    end
 
     currentFrame = currentFrame + dt
 
@@ -65,20 +77,24 @@ function love.keyreleased(key)
 end
 
 function love.draw()
-
     camera:attach()
     -- draw background
-    love.graphics.draw(bgImage,love.graphics.newQuad(-1, 0, 204, 204, 32, 128), -10, -10, 0, 5, 10)
+    love.graphics.draw(bgImage, love.graphics.newQuad(-1, 0, 204, 204, 32, 128), -10, -10, 0, 5, 10)
     world:draw()
 
     -- draw entities
-    player:draw()
-    f1:draw()
+    for index, entity in ipairs(ENTITIES) do
+        entity:draw()
+    end
+
     camera:detach()
 end
 
 function loadWorld()
     world = wf.newWorld(0, 0, true)
+    world:addCollisionClass('Player')
+    world:addCollisionClass('Fish')
+
     local worldBounds = {
         top = world:newRectangleCollider(-10, -10, WORLD_WIDTH, 10),
         right = world:newRectangleCollider(WORLD_WIDTH - 10, 0, 10, WORLD_HEIGHT),
@@ -90,4 +106,5 @@ function loadWorld()
         collider:setType("static")
     end
 end
+
 -- 1020

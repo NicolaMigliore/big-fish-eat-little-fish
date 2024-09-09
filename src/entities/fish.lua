@@ -1,17 +1,25 @@
 local Entity = require "src.entities.entity"
 local Fish = Entity:extend()
 
-function Fish:new(x, y, spriteFileName)
-    self.maxSpeed = 500
-    self.strength = 20000
-    self.size = 10
+--- Fish constructor
+--- @param x number Position x coordinate
+--- @param y number Position y coordinate
+--- @param size number initial size
+--- @param spriteFileName string file name fo rthe spritesheet
+function Fish:new(x, y, size, spriteFileName)
+    self.size = size or 5
+    -- self.strength = 500 + 100 / self.size
+    self.strength = 400 + 200 / self.size
+    self.maxSpeed = 450 + 250 / self.size 
     local spr = Sprite(spriteFileName)
 
     -- configure collider
-    local collider = world:newRectangleCollider(x - 16, y - 16, 32, 32)
+    local collider = world:newRectangleCollider(x - 16, y - 8, 32 * self.size / 10, 16 * self.size / 10)
     collider:setFixedRotation(true)
-    collider:setMass(100)
+    collider:setMass(1)
     collider:setLinearDamping(1)
+    collider:setCollisionClass("Fish")
+    collider:setObject(self)
 
     -- configure control
     -- local control = Control()
@@ -45,8 +53,25 @@ function Fish:update(dt)
 end
 
 function Fish:draw()
-    Fish.super.draw(self)
-    love.graphics.print(self.state.current, self.position.x - 16, self.position.y - 36)
+    -- Fish.super.draw(self)
+
+    local activeAnim = self.animationController.activeAnimation
+    local frameToDraw = activeAnim.frames[math.floor(self.animationController.currentFrame)]
+    local dx = (activeAnim.flipX or self.position.dx < 0) and -1 or 1
+    local dy = activeAnim.flipY and -1 or 1
+    local scaleX = dx * self.size / 10
+    local scaleY = dy * self.size / 10
+    love.graphics.draw(
+        self.sprite.image,
+        frameToDraw,
+        self.position.x,
+        self.position.y,
+        nil,
+        scaleX,
+        scaleY,
+        activeAnim.width / 2,
+        activeAnim.height / 2
+    )
 end
 
 function Fish:createAnimationController(spr)
