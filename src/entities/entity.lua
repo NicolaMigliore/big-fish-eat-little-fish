@@ -4,7 +4,8 @@ local Entity = Object.extend(Object)
 ---@diagnostic disable-next-line: undefined-doc-name
 ---@param sprite Sprite entity sprite data
 ---@param options table table of components to add to the entity
-function Entity:new(type, sprite, options)
+function Entity:new(id, type, sprite, options)
+    self.id = id or Utils:uuid()
     self.type = type
     self.sprite = sprite
     self.position = options.position
@@ -57,9 +58,9 @@ function Entity:draw()
     end
 end
 
--- set current entity sprite
-function Entity:setSprite()
-
+function Entity:kill()
+    self.collider:destroy()
+    ENTITIES[self.id] = nil
 end
 
 return Entity

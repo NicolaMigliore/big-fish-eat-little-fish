@@ -6,7 +6,7 @@ local Fish = Entity:extend()
 --- @param y number Position y coordinate
 --- @param size number initial size
 --- @param spriteFileName string file name fo rthe spritesheet
-function Fish:new(x, y, size, spriteFileName)
+function Fish:new(id, x, y, size, spriteFileName)
     self.size = size or 5
     -- self.strength = 500 + 100 / self.size
     self.strength = 400 + 200 / self.size
@@ -40,7 +40,7 @@ function Fish:new(x, y, size, spriteFileName)
         animationController = animationController,
         state = state,
     }
-    Fish.super.new(self, "fish", spr, entityOptions)
+    Fish.super.new(self, id, "fish", spr, entityOptions)
 end
 
 function Fish:update(dt)
@@ -50,11 +50,32 @@ function Fish:update(dt)
 
     self.position.x = self.collider:getX()
     self.position.y = self.collider:getY()
+
+    -- check collisions
+    local fishClasses = {"Fish", "Player"}
+    for _, cl in ipairs(fishClasses) do
+        if self.collider:enter(cl) then
+            local collisionData = self.collider:getEnterCollisionData(cl)
+            local other = collisionData.collider:getObject()
+            if other then
+                local sizeDelta = self.size - other.size
+                if sizeDelta >= 5 then
+                -- if fish is larger than other
+                self:eat()
+                other:kill()
+                elseif sizeDelta < 5 then 
+                    other:eat()
+                    self:kill()
+                else
+                    print("same size")
+                end
+            end
+        end
+    end
 end
 
 function Fish:draw()
     -- Fish.super.draw(self)
-
     local activeAnim = self.animationController.activeAnimation
     local frameToDraw = activeAnim.frames[math.floor(self.animationController.currentFrame)]
     local dx = (activeAnim.flipX or self.position.dx < 0) and -1 or 1
@@ -98,6 +119,10 @@ function Fish:createAnimationController(spr)
         seek = seekAnimation,
     }, "idle")
     return animationController
+end
+
+function Fish:eat()
+    self.size = self.size + 2
 end
 
 function Fish:createState()

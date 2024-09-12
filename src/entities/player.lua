@@ -1,8 +1,8 @@
 local Fish = require "src.entities.fish"
 local Player = Fish:extend()
 
-function Player:new(x, y)
-    Player.super.new(self, x, y, 10, "assets/sprites/fish_01.png")
+function Player:new(id, x, y)
+    Player.super.new(self,id, x, y, 10, "assets/sprites/fish_01.png")
 
     self.type    = "player"
     self.collider:setCollisionClass("Player")
@@ -28,10 +28,6 @@ end
 
 function Player:draw()
     Player.super.draw(self)
-
-    love.graphics.print(self.position.dx, 10, 10)
-    love.graphics.print(self.position.dy, 10, 20)
-    love.graphics.print(self.type, 10, 30)
 end
 
 function Player:fishControl()
@@ -84,6 +80,10 @@ function Player:createState()
     }
     local state = State(states, "idle")
     return state
+end
+
+function Player:kill()
+    -- print("killed player")
 end
 
 return Player

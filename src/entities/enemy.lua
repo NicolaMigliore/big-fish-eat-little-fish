@@ -4,8 +4,8 @@ local Enemy = Fish:extend()
 local scanTime = 3
 local memoryTime = 1
 
-function Enemy:new(x, y, size)
-    Enemy.super.new(self, x, y, size, "assets/sprites/fish_01.png")
+function Enemy:new(id, x, y, size)
+    Enemy.super.new(self,id, x, y, size, "assets/sprites/fish_01.png")
     self.type = "enemy"
 
     -- seek timer
@@ -41,7 +41,7 @@ function Enemy:update(dt)
     if self.predator == nil or self.prey == nil then
         local colliders = world:queryCircleArea(self.position.x, self.position.y, scanDistance)
         for _, collider in ipairs(colliders) do
-            local isFish = collider.collision_class == "Fish" --or collider.collision_class == "Player"
+            local isFish = collider.collision_class == "Fish" or collider.collision_class == "Player"
             if isFish then
                 local entity = collider:getObject()
                 local isOther = entity ~= self
@@ -238,4 +238,9 @@ function Enemy:getNewTarget()
     return { x = tx, y = ty }
 end
 
+function Enemy:eat()
+    self.prey = nil
+    self.predator = nil
+    self.super.eat(self)
+end
 return Enemy

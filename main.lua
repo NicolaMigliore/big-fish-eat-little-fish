@@ -45,25 +45,20 @@ function love.load()
     bgImage = love.graphics.newImage("assets/background.png")
     bgImage:setWrap("repeat", "clamp")
 
-    player = Player(200, 200)
-    table.insert(ENTITIES, player)
+    player = Player(nil, 200, 200)
+    ENTITIES[player.id] = player
     for i = 1, 5, 1 do
         -- local tmpEnemy = Enemy(math.random(40, WORLD_WIDTH - 40), 100 + i * math.random(50), "assets/sprites/fish_01.png")
-        local tmpEnemy = Enemy(250, 250 + i * math.random(50), math.floor(math.random(30)), "assets/sprites/fish_01.png")
-        table.insert(ENTITIES, tmpEnemy)
+        local tmpEnemy = Enemy(nil, 250, 250 + i * math.random(50), math.floor(math.random(30)), "assets/sprites/fish_01.png")
+        ENTITIES[tmpEnemy.id] = tmpEnemy
     end
-
-    -- local tmpEnemy = Enemy(250, 250, 10, "assets/sprites/fish_01.png")
-    -- table.insert(ENTITIES, tmpEnemy)
-    -- local tmpEnemy = Enemy(250, 300, 5, "assets/sprites/fish_01.png")
-    -- table.insert(ENTITIES, tmpEnemy)
 end
 
 function love.update(dt)
     world:update(dt)
 
     -- update entities
-    for index, entity in ipairs(ENTITIES) do
+    for _, entity in pairs(ENTITIES) do
         entity:update(dt)
     end
 
@@ -83,7 +78,7 @@ function love.draw()
     world:draw()
 
     -- draw entities
-    for index, entity in ipairs(ENTITIES) do
+    for _, entity in pairs(ENTITIES) do
         entity:draw()
     end
 
@@ -106,5 +101,3 @@ function loadWorld()
         collider:setType("static")
     end
 end
-
--- 1020
