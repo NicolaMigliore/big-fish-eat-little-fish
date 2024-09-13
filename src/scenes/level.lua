@@ -61,7 +61,7 @@ function Level:update(dt)
     end
 
     -- update depth label
-    UI.labels.depth = "DEPTH:"..math.floor(PLAYER.position.y / 100)
+    UI.labels.depth.text = "DEPTH:"..math.floor(PLAYER.position.y / 80)
 
     -- move camera
     CAMERA:lookAt(math.floor(PLAYER.position.x), math.floor(PLAYER.position.y))
@@ -92,7 +92,7 @@ end
 function LOAD_SCENE_LEVEL()
     SCENE = "level"
     UI:clearUI()
-    UI:addLabel("depth", "DEPTH: 0", 100, 100)
+    UI:addLabel("depth", "DEPTH: 0", 10, 0)
 
     Level:loadLevel(1)
 end
@@ -113,7 +113,7 @@ function Level:loadWorld()
         collider:setType("static")
     end
 
-    PLAYER = Player(nil, 200, 200)
+    PLAYER = Player(nil, WORLD_WIDTH/2, 200)
     ENTITIES[PLAYER.id] = PLAYER
 end
 return Level

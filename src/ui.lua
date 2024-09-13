@@ -1,6 +1,7 @@
 local UI = Object.extend(Object)
 
 local buttonFont = love.graphics.newFont(25)
+local labelFont = love.graphics.newFont("assets/mago2.ttf",75)
 
 function UI:new()
     self.buttons = {}
@@ -36,6 +37,11 @@ function UI:draw()
         local textX = btn.x + (btn.width / 2) - (textW / 2)
         local textY = btn.y + (btn.height / 2) - (textH / 2)
         love.graphics.print(btn.text, textX, textY)
+    end
+    -- draw labels
+    love.graphics.setFont(labelFont)
+    for key,label in pairs(self.labels) do
+        love.graphics.print(label.text, label.x, label.y)
     end
 end
 
