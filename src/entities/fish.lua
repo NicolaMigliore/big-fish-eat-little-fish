@@ -158,7 +158,9 @@ function Fish:createAnimationController(spr)
 end
 
 function Fish:eat()
-    self.size = self.size + 2
+    if self.size <= 25 then
+        self.size = self.size + 2
+    end
 end
 
 function Fish:createState()

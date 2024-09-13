@@ -12,7 +12,7 @@ function Level:load()
     self:loadWorld()
     self:loadLevel(1)
 
-    CAMERA = Camera(0, 0, 1)
+    CAMERA = Camera(0, 0, 2)
 
     -- configure background
     bgImage = love.graphics.newImage("assets/background.png")
@@ -83,7 +83,6 @@ function Level:spawnSchool()
         
         local smallFish = Enemy(nil, x + xOffset, y + yOffset, PLAYER.size - 5, "assets/sprites/fish_01.png")
         ENTITIES[smallFish.id] = smallFish
-        print("spawned fish at: "..x + xOffset..","..y + yOffset)
     end
     for i=1, math.random(1,2) do
         local largeFish = Enemy(nil, x + xOffset, y + yOffset + 300, PLAYER.size + 5, "assets/sprites/fish_01.png")

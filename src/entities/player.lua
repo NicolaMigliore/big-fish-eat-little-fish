@@ -82,6 +82,15 @@ function Player:createState()
     return state
 end
 
+function Player:eat()
+    if self.size <= 30 then
+        self.size = self.size + 2
+        local newZoom = 2 - (self.size - 10) * (2 - 0.7) / (30 - 10)
+        CAMERA:zoomTo(newZoom)
+    end
+    
+end
+
 function Player:kill()
     -- print("killed player")
 end
