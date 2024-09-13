@@ -14,6 +14,7 @@ function Entity:new(id, type, sprite, options)
     self.intention = options.intention
     self.animationController = options.animationController
     self.state = options.state
+    self.particles = options.particles
 end
 
 function Entity:update(dt)

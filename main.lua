@@ -18,9 +18,11 @@ local controlComponents = require("src.components.control")
 Control, Intention = controlComponents[1], controlComponents[2]
 local animComponents = require("src.components.animation")
 Animation, AnimationController = animComponents[1], animComponents[2]
+Particles = require "src.components.particles"
 State = require "src.components.state"
 Level = require "src.scenes.level"
 Title = require "src.scenes.title"
+
 
 -- load entities
 
@@ -32,12 +34,14 @@ ENTITIES = {}
 CAMERA = nil
 PLAYER = nil
 SCENE = "title"
+SCORE = 0
 UI = ui()
 
 function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
     love.graphics.setBackgroundColor(.5, .7, 1)
 
+    -- load scenes
     Title:load()
     Level:load()
 

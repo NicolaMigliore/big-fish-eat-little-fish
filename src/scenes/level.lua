@@ -33,30 +33,10 @@ function Level:update(dt)
     end
 
     -- spawn fish
-    local worldPadding = 40
     if Utils.tabelCount(ENTITIES) <= 10 and math.random() > .5 then
         spawnTimer = spawnTimer - dt
         if spawnTimer < 0 then
-            local x,y = PLAYER.position.x, PLAYER.position.y
-            local xOffset, yOffset = 0, 0
-
-            for i=1, math.random(4,9) do
-                xOffset = 100 + math.random(200,450)
-                yOffset = 100 + math.random(100,350)
-    
-                if x + xOffset > WORLD_WIDTH + worldPadding then xOffset = -xOffset end
-                if y + yOffset > WORLD_HEIGHT + worldPadding then yOffset = -yOffset end
-                
-                local smallFish = Enemy(nil, x + xOffset, y + yOffset, PLAYER.size - 5, "assets/sprites/fish_01.png")
-                ENTITIES[smallFish.id] = smallFish
-                print("spawned fish at: "..x + xOffset..","..y + yOffset)
-            end
-            for i=1, math.random(1,2) do
-                local largeFish = Enemy(nil, x + xOffset, y + yOffset + 300, PLAYER.size + 5, "assets/sprites/fish_01.png")
-                ENTITIES[largeFish.id] = largeFish
-            end
-            -- local spawnCounter = math.floor(math.random(5))
-            spawnTimer = 10
+            self:spawnSchool()
         end
     end
 
@@ -87,6 +67,30 @@ function Level:loadLevel(depth)
     --     local tmpEnemy = Enemy(nil, 250, 250 + i * math.random(50), math.floor(math.random(30)), "assets/sprites/fish_01.png")
     --     ENTITIES[tmpEnemy.id] = tmpEnemy
     -- end
+end
+
+function Level:spawnSchool()
+    local worldPadding = 40
+    local x,y = PLAYER.position.x, PLAYER.position.y
+    local xOffset, yOffset = 0, 0
+
+    for i=1, math.random(4,9) do
+        xOffset = 100 + math.random(200,450)
+        yOffset = 100 + math.random(100,350)
+
+        if x + xOffset > WORLD_WIDTH + worldPadding then xOffset = -xOffset end
+        if y + yOffset > WORLD_HEIGHT + worldPadding then yOffset = -yOffset end
+        
+        local smallFish = Enemy(nil, x + xOffset, y + yOffset, PLAYER.size - 5, "assets/sprites/fish_01.png")
+        ENTITIES[smallFish.id] = smallFish
+        print("spawned fish at: "..x + xOffset..","..y + yOffset)
+    end
+    for i=1, math.random(1,2) do
+        local largeFish = Enemy(nil, x + xOffset, y + yOffset + 300, PLAYER.size + 5, "assets/sprites/fish_01.png")
+        ENTITIES[largeFish.id] = largeFish
+    end
+    -- local spawnCounter = math.floor(math.random(5))
+    spawnTimer = 10
 end
 
 function LOAD_SCENE_LEVEL()

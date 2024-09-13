@@ -31,6 +31,12 @@ function Fish:new(id, x, y, size, spriteFileName)
     -- define states
     local state = self:createState()
 
+    -- define particles
+    self.boubleTimer = math.random(3)
+    local particles = Particles()
+    particles:addBoubleParticle()
+    self.boubleLocation = { x = 0, y = 0}
+
     local position = Position(x, y)
     local entityOptions = {
         position = position,
@@ -39,6 +45,7 @@ function Fish:new(id, x, y, size, spriteFileName)
         intention = intention,
         animationController = animationController,
         state = state,
+        particles = particles,
     }
     Fish.super.new(self, id, "fish", spr, entityOptions)
 end
@@ -72,6 +79,25 @@ function Fish:update(dt)
             end
         end
     end
+
+    
+    -- update particles
+    if self.particles then
+        for _,key in ipairs(self.particles:getKeys()) do
+            local particleSystem = self.particles[key]
+            if particleSystem ~= nil then
+                particleSystem:update(dt)
+            end
+        end
+        -- emit particles
+        self.boubleTimer = self.boubleTimer - dt
+        if self.boubleTimer < 0 then
+            self.boubleTimer = math.random(1,3)
+            self.boubleLocation = { x = self.position.x, y = self.position.y }
+            self.particles.boubles:emit(1)
+        end
+    end
+
 end
 
 function Fish:draw()
@@ -93,6 +119,16 @@ function Fish:draw()
         activeAnim.width / 2,
         activeAnim.height / 2
     )
+
+    
+    -- draw particles
+    
+    for _,key in ipairs(self.particles:getKeys()) do
+        local particleSystem = self.particles[key]
+        if particleSystem ~= nil then
+            love.graphics.draw(particleSystem, self.boubleLocation.x, self.boubleLocation.y)
+        end
+    end
 end
 
 function Fish:createAnimationController(spr)
