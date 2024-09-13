@@ -14,7 +14,7 @@ function Fish:new(id, x, y, size, spriteFileName)
     local spr = Sprite(spriteFileName)
 
     -- configure collider
-    local collider = world:newRectangleCollider(x - 16, y - 8, 32 * self.size / 10, 16 * self.size / 10)
+    local collider = WORLD:newRectangleCollider(x - 16, y - 8, 32 * self.size / 10, 16 * self.size / 10)
     collider:setFixedRotation(true)
     collider:setMass(1)
     collider:setLinearDamping(1)
@@ -59,11 +59,11 @@ function Fish:update(dt)
             local other = collisionData.collider:getObject()
             if other then
                 local sizeDelta = self.size - other.size
-                if sizeDelta >= 5 then
+                if sizeDelta > 0 then
                 -- if fish is larger than other
                 self:eat()
                 other:kill()
-                elseif sizeDelta < 5 then 
+                elseif sizeDelta < 0 then 
                     other:eat()
                     self:kill()
                 else

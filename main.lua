@@ -7,6 +7,7 @@ end
 -- load libraries
 Object = require "libs.classic"
 Utils = require "src.utils"
+local ui = require "src.ui"
 wf = require "libs.windfield"
 Camera = require "libs.hump.camera"
 
@@ -18,86 +19,66 @@ Control, Intention = controlComponents[1], controlComponents[2]
 local animComponents = require("src.components.animation")
 Animation, AnimationController = animComponents[1], animComponents[2]
 State = require "src.components.state"
+Level = require "src.scenes.level"
+Title = require "src.scenes.title"
 
 -- load entities
-local Fish = require "src.entities.fish"
-local Player = require "src.entities.player"
-local Enemy = require "src.entities.enemy"
+
 
 -- Define global objects
-WORLD_WIDTH, WORLD_HEIGHT = 1020, 2000
+WORLD_WIDTH, WORLD_HEIGHT = 2020, 8000
+WORLD = nil
 ENTITIES = {}
-
-local bgImage
-local player
-local currentFrame = 1
+CAMERA = nil
+PLAYER = nil
+SCENE = "title"
+UI = ui()
 
 function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
     love.graphics.setBackgroundColor(.5, .7, 1)
 
-    loadWorld()
+    Title:load()
+    Level:load()
 
-    -- world:setGravity(0, 10)
-    camera = Camera(0, 0, 1)
-
-    -- configure background
-    bgImage = love.graphics.newImage("assets/background.png")
-    bgImage:setWrap("repeat", "clamp")
-
-    player = Player(nil, 200, 200)
-    ENTITIES[player.id] = player
-    for i = 1, 5, 1 do
-        -- local tmpEnemy = Enemy(math.random(40, WORLD_WIDTH - 40), 100 + i * math.random(50), "assets/sprites/fish_01.png")
-        local tmpEnemy = Enemy(nil, 250, 250 + i * math.random(50), math.floor(math.random(30)), "assets/sprites/fish_01.png")
-        ENTITIES[tmpEnemy.id] = tmpEnemy
-    end
+    -- set initial scene
+    LOAD_SCENE_TITLE()
 end
 
 function love.update(dt)
-    world:update(dt)
-
-    -- update entities
-    for _, entity in pairs(ENTITIES) do
-        entity:update(dt)
+    if SCENE == "title" then
+        Title:update(dt)
+    elseif SCENE == "level" then
+        Level:update(dt)
     end
-
-    currentFrame = currentFrame + dt
-
-    -- move camera
-    camera:lookAt(math.floor(player.position.x), math.floor(player.position.y))
-end
-
-function love.keyreleased(key)
+    UI:update(dt)
 end
 
 function love.draw()
-    camera:attach()
-    -- draw background
-    love.graphics.draw(bgImage, love.graphics.newQuad(-1, 0, 204, 204, 32, 128), -10, -10, 0, 5, 10)
-    world:draw()
-
-    -- draw entities
-    for _, entity in pairs(ENTITIES) do
-        entity:draw()
+    if SCENE == "title" then
+        Title:draw()
+    elseif SCENE == "level" then
+        Level:draw()
     end
-
-    camera:detach()
+    UI:draw()
 end
 
-function loadWorld()
-    world = wf.newWorld(0, 0, true)
-    world:addCollisionClass('Player')
-    world:addCollisionClass('Fish')
-
-    local worldBounds = {
-        top = world:newRectangleCollider(-10, -10, WORLD_WIDTH, 10),
-        right = world:newRectangleCollider(WORLD_WIDTH - 10, 0, 10, WORLD_HEIGHT),
-        bottom = world:newRectangleCollider(-10, WORLD_HEIGHT, WORLD_WIDTH, 10),
-        left = world:newRectangleCollider(-10, 0, 10, WORLD_HEIGHT),
-    }
-
-    for key, collider in pairs(worldBounds) do
-        collider:setType("static")
+-- input management
+function love.mousereleased(x, y, button)
+    if button == 1 then
+        for _, btn in ipairs(UI.buttons) do
+            if x >= btn.x and x <= btn.x + btn.width
+                and y >= btn.y and y <= btn.y + btn.height then
+                btn:onClick()
+                break
+            end
+        end
+    end
+end
+function love.keyreleased(key)
+    if SCENE == "title" then
+        if key == "space" then
+            LOAD_SCENE_LEVEL()
+        end
     end
 end

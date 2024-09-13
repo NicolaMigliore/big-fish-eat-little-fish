@@ -39,7 +39,7 @@ function Enemy:update(dt)
 
     -- spot predator and prey
     if self.predator == nil or self.prey == nil then
-        local colliders = world:queryCircleArea(self.position.x, self.position.y, scanDistance)
+        local colliders = WORLD:queryCircleArea(self.position.x, self.position.y, scanDistance)
         for _, collider in ipairs(colliders) do
             local isFish = collider.collision_class == "Fish" or collider.collision_class == "Player"
             if isFish then
@@ -70,26 +70,24 @@ end
 
 function Enemy:draw()
     Enemy.super.draw(self)
-    -- love.graphics.print(self.scanTimer, self.position.x - 16, self.position.y - 106)
+    -- -- draw target line
+    -- love.graphics.line(self.position.x, self.position.y, self.target.x, self.target.y)
 
-    -- draw target line
-    love.graphics.line(self.position.x, self.position.y, self.target.x, self.target.y)
+    -- -- draw predator line
+    -- if self.predator ~= nil then
+    --     love.graphics.setColor(0.7, 0.2, 0.2)
+    --     love.graphics.line(self.position.x, self.position.y, self.predator.position.x, self.predator.position.y)
+    --     love.graphics.setColor(1, 1, 1)
+    -- end
 
-    -- draw predator line
-    if self.predator ~= nil then
-        love.graphics.setColor(0.7, 0.2, 0.2)
-        love.graphics.line(self.position.x, self.position.y, self.predator.position.x, self.predator.position.y)
-        love.graphics.setColor(1, 1, 1)
-    end
+    -- -- draw prey line
+    -- if self.prey ~= nil then
+    --     love.graphics.setColor(0.2, 0.7, 0.2)
+    --     love.graphics.line(self.position.x, self.position.y, self.prey.position.x, self.prey.position.y)
+    --     love.graphics.setColor(1, 1, 1)
+    -- end
 
-    -- draw prey line
-    if self.prey ~= nil then
-        love.graphics.setColor(0.2, 0.7, 0.2)
-        love.graphics.line(self.position.x, self.position.y, self.prey.position.x, self.prey.position.y)
-        love.graphics.setColor(1, 1, 1)
-    end
-
-    love.graphics.print(tostring(self.state.current)..math.floor(self.memoryTimer), self.position.x - 16, self.position.y - 26)
+    love.graphics.print(self.size, self.position.x - 16, self.position.y - 26)
 end
 
 function Enemy:fishControl()

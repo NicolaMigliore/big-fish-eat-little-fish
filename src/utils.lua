@@ -78,6 +78,14 @@ function Utils.tableContains(table, value)
     return false
 end
 
+function Utils.tabelCount(table)
+    local cnt = 0
+    for k,v in pairs(table) do
+        cnt = cnt + 1        
+    end
+    return cnt
+end
+
 local random = math.random
 function Utils:uuid()
     local template ='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
