@@ -12,17 +12,12 @@ function Level:load()
     self:loadWorld()
     self:loadLevel(1)
 
-    CAMERA = Camera(0, 0, 2)
+    CAMERA = Camera(PLAYER.position.x, PLAYER.position.y, 2)
+    CAMERA.smoother = CAMERA.smooth.damped(10)
 
     -- configure background
     bgImage = love.graphics.newImage("assets/background.png")
     bgImage:setWrap("repeat", "clamp")
-
-    -- for i = 1, 5, 1 do
-    --     -- local tmpEnemy = Enemy(math.random(40, WORLD_WIDTH - 40), 100 + i * math.random(50), "assets/sprites/fish_01.png")
-    --     local tmpEnemy = Enemy(nil, 250, 250 + i * math.random(50), math.floor(math.random(30)), "assets/sprites/fish_01.png")
-    --     ENTITIES[tmpEnemy.id] = tmpEnemy
-    -- end
 end
 
 function Level:update(dt)
@@ -44,7 +39,14 @@ function Level:update(dt)
     UI.labels.depth.text = "DEPTH:"..math.floor(PLAYER.position.y / 80)
 
     -- move camera
-    CAMERA:lookAt(math.floor(PLAYER.position.x), math.floor(PLAYER.position.y))
+    local camScale = 1/CAMERA.scale
+    local viewportW, viewportH = love.graphics.getWidth() * camScale, love.graphics.getHeight() * camScale
+    local camX, camY = PLAYER.position.x, PLAYER.position.y
+    camX = math.max(camX, 0 + viewportW / 2) -- restrict left
+    camX = math.min(camX, WORLD_WIDTH - viewportW / 2) -- restrict right
+    camY = math.max(camY, 0 + viewportH / 2) -- restrict top
+    camY = math.min(camY, WORLD_HEIGHT - viewportH / 2) -- restrict bottom
+    CAMERA:lockPosition(camX, camY)
 end
 
 function Level:draw()
