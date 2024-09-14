@@ -70,24 +70,6 @@ end
 
 function Enemy:draw()
     Enemy.super.draw(self)
-    -- -- draw target line
-    -- love.graphics.line(self.position.x, self.position.y, self.target.x, self.target.y)
-
-    -- -- draw predator line
-    -- if self.predator ~= nil then
-    --     love.graphics.setColor(0.7, 0.2, 0.2)
-    --     love.graphics.line(self.position.x, self.position.y, self.predator.position.x, self.predator.position.y)
-    --     love.graphics.setColor(1, 1, 1)
-    -- end
-
-    -- -- draw prey line
-    -- if self.prey ~= nil then
-    --     love.graphics.setColor(0.2, 0.7, 0.2)
-    --     love.graphics.line(self.position.x, self.position.y, self.prey.position.x, self.prey.position.y)
-    --     love.graphics.setColor(1, 1, 1)
-    -- end
-
-    love.graphics.print(self.size, self.position.x - 16, self.position.y - 26)
 end
 
 function Enemy:fishControl()

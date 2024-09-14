@@ -3,7 +3,6 @@ local Title = Object.extend(Object)
 local titleImage
 
 -- ui elements
-local buttons = {}
 function Title:load()
     titleImage = love.graphics.newImage("assets/title.png")
 end
@@ -55,13 +54,14 @@ function LOAD_SCENE_TITLE()
     UI:clearUI()
     love.graphics.setBackgroundColor(love.math.colorFromBytes(44, 232, 245))
 
+    local r, g, b = love.math.colorFromBytes(24,20,37)
     -- button
     local button = {
-        x = 100,
-        y = 100,
+        x = nil,
+        y = nil,
         width = 350,
         height = 50,
-        color = { .6, .7, .9, 1 },
+        color = { r, g, b },
         text = "START GAME",
         onClick = function() LOAD_SCENE_LEVEL() end
     }

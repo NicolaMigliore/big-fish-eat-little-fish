@@ -6,14 +6,10 @@ local Enemy = require "src.entities.enemy"
 
 local gameMap
 local spawnTimer = 0
+local levelEndTime = nil
+local deathTime = nil
 
 function Level:load()
-
-    self:loadWorld()
-    self:loadLevel(1)
-
-    CAMERA = Camera(PLAYER.position.x, PLAYER.position.y, 2)
-    CAMERA.smoother = CAMERA.smooth.damped(10)
 
     -- configure map
     gameMap = sti("src/maps/map.lua")
@@ -46,6 +42,23 @@ function Level:update(dt)
     camY = math.max(camY, 0 + viewportH / 2) -- restrict top
     camY = math.min(camY, WORLD_HEIGHT - viewportH / 2) -- restrict bottom
     CAMERA:lockPosition(camX, camY)
+
+    -- end level
+    if levelEndTime == nil and PLAYER.position.y > WORLD_HEIGHT - 40 then
+        levelEndTime = love.timer.getTime()
+    end
+    if levelEndTime ~= nil and love.timer.getTime() - levelEndTime > 1.5 then
+        LOAD_SCENE_LEVEL_END()
+    end
+
+    -- player death
+    if deathTime == nil and PLAYER.state.current == "death" then
+        deathTime = love.timer.getTime()
+    end
+    if deathTime ~= nil and love.timer.getTime() - deathTime > 2.5 then
+        SCORE = SCORE + math.floor(PLAYER.position.y / 80)
+        LOAD_SCENE_DEATH()
+    end
 end
 
 function Level:draw()
@@ -57,7 +70,7 @@ function Level:draw()
     -- draw map
     gameMap:drawLayer(gameMap.layers["borders"])
 
-    WORLD:draw()
+    -- WORLD:draw()
 
     -- draw entities
     for _, entity in pairs(ENTITIES) do
@@ -68,11 +81,7 @@ function Level:draw()
 end
 
 function Level:loadLevel(depth)
-    -- for i = 1, 5, 1 do
-    --     -- local tmpEnemy = Enemy(math.random(40, WORLD_WIDTH - 40), 100 + i * math.random(50), "assets/sprites/fish_01.png")
-    --     local tmpEnemy = Enemy(nil, 250, 250 + i * math.random(50), math.floor(math.random(30)), "assets/sprites/fish_01.png")
-    --     ENTITIES[tmpEnemy.id] = tmpEnemy
-    -- end
+    ENTITIES = {}
 end
 
 function Level:spawnSchool()
@@ -98,7 +107,7 @@ function Level:spawnSchool()
         ENTITIES[largeFish.id] = largeFish
     end
     -- local spawnCounter = math.floor(math.random(5))
-    spawnTimer = 10
+    spawnTimer = 2
 end
 
 function LOAD_SCENE_LEVEL()
@@ -106,7 +115,13 @@ function LOAD_SCENE_LEVEL()
     UI:clearUI()
     UI:addLabel("depth", "DEPTH: 0", 10, 0)
 
+    levelEndTime = nil
+    deathTime = nil
+    
     Level:loadLevel(1)
+    Level:loadWorld()
+    CAMERA = Camera(PLAYER.position.x, PLAYER.position.y, 2)
+    CAMERA.smoother = CAMERA.smooth.damped(10)
 end
 
 function Level:loadWorld()

@@ -22,8 +22,12 @@ local animComponents = require("src.components.animation")
 Animation, AnimationController = animComponents[1], animComponents[2]
 Particles = require "src.components.particles"
 State = require "src.components.state"
+
+-- load scenes
 Level = require "src.scenes.level"
 Title = require "src.scenes.title"
+LevelEnd = require "src.scenes.levelEnd"
+Death = require "src.scenes.death"
 
 
 -- load entities
@@ -45,6 +49,7 @@ function love.load()
     -- load scenes
     Title:load()
     Level:load()
+    LevelEnd:load()
 
     -- set initial scene
     LOAD_SCENE_TITLE()
@@ -55,6 +60,10 @@ function love.update(dt)
         Title:update(dt)
     elseif SCENE == "level" then
         Level:update(dt)
+    elseif SCENE == "level_end" then
+        LevelEnd:update(dt)
+    elseif SCENE == "death" then
+        Death:update(dt)
     end
     UI:update(dt)
 end
@@ -64,6 +73,10 @@ function love.draw()
         Title:draw()
     elseif SCENE == "level" then
         Level:draw()
+    elseif SCENE == "level_end" then
+        LevelEnd:draw()
+    elseif SCENE == "death" then
+        Death:draw()
     end
     UI:draw()
 end

@@ -4,7 +4,7 @@ local Player = Fish:extend()
 function Player:new(id, x, y)
     Player.super.new(self,id, x, y, 10, "assets/sprites/fish_01.png")
 
-    self.type    = "player"
+    self.type = "player"
     self.collider:setCollisionClass("Player")
 
     -- configure control
@@ -31,6 +31,9 @@ function Player:draw()
 end
 
 function Player:fishControl()
+    if self.state.current == "death" then
+        return
+    end
     local vx, vy = self.collider:getLinearVelocity()
     local direction = { x = 0, y = 0 }
 
@@ -77,6 +80,10 @@ function Player:createState()
             end
             return "swim"
         end,
+        death = function()
+            self.control = nil
+            return "death"
+        end
     }
     local state = State(states, "idle")
     return state
@@ -88,11 +95,11 @@ function Player:eat()
         local newZoom = 2 - (self.size - 10) * (2 - 0.7) / (30 - 10)
         CAMERA:zoomTo(newZoom)
     end
-    
+    SCORE = SCORE + math.floor(self.size / 10)
 end
 
 function Player:kill()
-    -- print("killed player")
+    self.state:setState("death", self)
 end
 
 return Player
