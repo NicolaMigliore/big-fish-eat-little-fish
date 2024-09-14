@@ -11,6 +11,7 @@ local ui = require "src.ui"
 wf = require "libs.windfield"
 Camera = require "libs.hump.camera"
 sti = require "libs.sti"
+gradient = require "libs.gradient"
 
 -- load components
 Position = require "src.components.position"
@@ -40,7 +41,6 @@ UI = ui()
 
 function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
-    love.graphics.setBackgroundColor(.5, .7, 1)
 
     -- load scenes
     Title:load()

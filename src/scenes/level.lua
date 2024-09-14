@@ -4,7 +4,6 @@ local Level = Object.extend(Object)
 local Player = require "src.entities.player"
 local Enemy = require "src.entities.enemy"
 
-local bgImage
 local gameMap
 local spawnTimer = 0
 
@@ -16,9 +15,7 @@ function Level:load()
     CAMERA = Camera(PLAYER.position.x, PLAYER.position.y, 2)
     CAMERA.smoother = CAMERA.smooth.damped(10)
 
-    -- configure background
-    bgImage = love.graphics.newImage("assets/background.png")
-    bgImage:setWrap("repeat", "clamp")
+    -- configure map
     gameMap = sti("src/maps/map.lua")
 end
 
@@ -54,7 +51,9 @@ end
 function Level:draw()
     CAMERA:attach()
     -- draw background
-    -- love.graphics.draw(bgImage, love.graphics.newQuad(-1, 0, 204, 204, 32, 128), -10, -10, 0, 5, 10)
+    self:drawGradient()
+    love.graphics.setColor(1,1,1,1)
+
     -- draw map
     gameMap:drawLayer(gameMap.layers["borders"])
 
@@ -85,8 +84,11 @@ function Level:spawnSchool()
         xOffset = 100 + math.random(200,450)
         yOffset = 100 + math.random(100,350)
 
-        if x + xOffset > WORLD_WIDTH + worldPadding then xOffset = -xOffset end
-        if y + yOffset > WORLD_HEIGHT + worldPadding then yOffset = -yOffset end
+        if (x + xOffset < 0 + worldPadding) or (x + xOffset > WORLD_WIDTH + worldPadding) then
+            print("out of bounds: "..(x + xOffset).." changed to: "..(x - xOffset))
+            xOffset = - xOffset
+        end
+        if y + yOffset > WORLD_HEIGHT + worldPadding then yOffset = - yOffset end
         
         local smallFish = Enemy(nil, x + xOffset, y + yOffset, PLAYER.size - 5, "assets/sprites/fish_01.png")
         ENTITIES[smallFish.id] = smallFish
@@ -126,4 +128,20 @@ function Level:loadWorld()
     PLAYER = Player(nil, WORLD_WIDTH/2, 200)
     ENTITIES[PLAYER.id] = PLAYER
 end
+
+function Level:drawGradient()
+    -- Rectangle with linear gradient
+    local color1 = {44/255, 232/255, 245/255, 1}
+    local color2 = {18/255, 78/255, 137/255, 1}
+
+    local x, y = 0, 0
+    local width, height = WORLD_HEIGHT, WORLD_WIDTH
+
+	love.gradient.draw(
+		function()
+			love.graphics.rectangle("fill", x, y, width, height)
+		end, "linear",
+		x + height/2, y + width/2, width/2, height/2, color1, color2, math.pi/2)
+end
+
 return Level

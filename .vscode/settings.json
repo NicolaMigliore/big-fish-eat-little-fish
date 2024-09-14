@@ -5,7 +5,8 @@
         "wf",
         "world",
         "camera",
-        "sti"
+        "sti",
+        "gradient"
     ],
     "Lua.workspace.library": [
         "${3rd}/love2d/library"
