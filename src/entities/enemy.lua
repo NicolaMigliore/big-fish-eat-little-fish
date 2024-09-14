@@ -41,7 +41,7 @@ function Enemy:update(dt)
     if self.predator == nil or self.prey == nil then
         local colliders = WORLD:queryCircleArea(self.position.x, self.position.y, scanDistance)
         for _, collider in ipairs(colliders) do
-            local isFish = collider.collision_class == "Fish" or collider.collision_class == "Player"
+            local isFish = collider.collision_class == "Fish" -- or collider.collision_class == "Player"
             if isFish then
                 local entity = collider:getObject()
                 local isOther = entity ~= self

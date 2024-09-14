@@ -4,7 +4,8 @@
         "love",
         "wf",
         "world",
-        "camera"
+        "camera",
+        "sti"
     ],
     "Lua.workspace.library": [
         "${3rd}/love2d/library"

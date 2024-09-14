@@ -10,6 +10,7 @@ Utils = require "src.utils"
 local ui = require "src.ui"
 wf = require "libs.windfield"
 Camera = require "libs.hump.camera"
+sti = require "libs.sti"
 
 -- load components
 Position = require "src.components.position"
@@ -28,7 +29,7 @@ Title = require "src.scenes.title"
 
 
 -- Define global objects
-WORLD_WIDTH, WORLD_HEIGHT = 2020, 8000
+WORLD_WIDTH, WORLD_HEIGHT = 2048, 8000
 WORLD = nil
 ENTITIES = {}
 CAMERA = nil

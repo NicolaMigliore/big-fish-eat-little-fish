@@ -5,6 +5,7 @@ local Player = require "src.entities.player"
 local Enemy = require "src.entities.enemy"
 
 local bgImage
+local gameMap
 local spawnTimer = 0
 
 function Level:load()
@@ -18,6 +19,7 @@ function Level:load()
     -- configure background
     bgImage = love.graphics.newImage("assets/background.png")
     bgImage:setWrap("repeat", "clamp")
+    gameMap = sti("src/maps/map.lua")
 end
 
 function Level:update(dt)
@@ -52,7 +54,10 @@ end
 function Level:draw()
     CAMERA:attach()
     -- draw background
-    love.graphics.draw(bgImage, love.graphics.newQuad(-1, 0, 204, 204, 32, 128), -10, -10, 0, 5, 10)
+    -- love.graphics.draw(bgImage, love.graphics.newQuad(-1, 0, 204, 204, 32, 128), -10, -10, 0, 5, 10)
+    -- draw map
+    gameMap:drawLayer(gameMap.layers["borders"])
+
     WORLD:draw()
 
     -- draw entities
@@ -108,10 +113,10 @@ function Level:loadWorld()
     WORLD:addCollisionClass('Fish')
 
     local worldBounds = {
-        top = WORLD:newRectangleCollider(-10, -10, WORLD_WIDTH, 10),
-        right = WORLD:newRectangleCollider(WORLD_WIDTH - 10, 0, 10, WORLD_HEIGHT),
-        bottom = WORLD:newRectangleCollider(-10, WORLD_HEIGHT, WORLD_WIDTH, 10),
-        left = WORLD:newRectangleCollider(-10, 0, 10, WORLD_HEIGHT),
+        top = WORLD:newRectangleCollider(0, -10, WORLD_WIDTH, 10),
+        right = WORLD:newRectangleCollider(WORLD_WIDTH -16, 0, 16, WORLD_HEIGHT),
+        bottom = WORLD:newRectangleCollider(0, WORLD_HEIGHT - 16, WORLD_WIDTH, 16),
+        left = WORLD:newRectangleCollider(0, 0, 16, WORLD_HEIGHT),
     }
 
     for key, collider in pairs(worldBounds) do
