@@ -153,7 +153,7 @@ function Level:spawnSchool()
             ENTITIES[smallFish.id] = smallFish
         else
             -- spawn larger
-            local smallFish = Enemy(nil, spawnX, spawnY, PLAYER.size + 5, "assets/sprites/fish_01.png")
+            local smallFish = Enemy(nil, spawnX, spawnY, PLAYER.size + 5, "assets/sprites/fish_01_big.png")
             ENTITIES[smallFish.id] = smallFish
         end
     end

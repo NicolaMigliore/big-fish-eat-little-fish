@@ -7,4 +7,8 @@ function Sprite:new(sprite, width, height)
     self.height = height or 32
 end
 
+function Sprite:setImage(img)
+    self.image = img or love.graphics.newImage("assets/sprites/missing.png")
+end
+
 return Sprite

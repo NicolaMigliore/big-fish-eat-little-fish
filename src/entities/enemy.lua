@@ -4,8 +4,8 @@ local Enemy = Fish:extend()
 local scanTime = 3
 local memoryTime = 1
 
-function Enemy:new(id, x, y, size)
-    Enemy.super.new(self,id, x, y, size, "assets/sprites/fish_01.png")
+function Enemy:new(id, x, y, size, img)
+    Enemy.super.new(self,id, x, y, size, img)
     self.type = "enemy"
 
     -- seek timer
