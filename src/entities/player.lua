@@ -15,6 +15,8 @@ function Player:new(id, x, y)
             up = { "up", "w" },
             down = { "down", "s" }
         })
+    self.life = 3
+    self.eatCount = 0
 end
 
 function Player:update(dt)
@@ -96,10 +98,19 @@ function Player:eat()
         CAMERA:zoomTo(newZoom)
     end
     SCORE = SCORE + math.floor(self.size / 10)
+
+    self.eatCount = self.eatCount + 1
+    if self.eatCount % 5 == 0 then
+        self.life = self.life + 1
+    end
 end
 
 function Player:kill()
-    self.state:setState("death", self)
+    if self.life >= 0 then
+        self.life = self.life - 1
+    else
+        self.state:setState("death", self)
+    end
 end
 
 return Player

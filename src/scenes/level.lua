@@ -45,6 +45,8 @@ function Level:update(dt)
 
     -- update depth label
     UI.labels.depth.text = "DEPTH:"..math.floor(PLAYER.position.y / 80)
+    UI.labels.score.text = "SCORE:"..math.floor(SCORE)
+    UI.labels.life.text = "LIVES:"..PLAYER.life
 
     -- move camera
     local camScale = 1/CAMERA.scale
@@ -164,6 +166,8 @@ function LOAD_SCENE_LEVEL()
     SCENE = "level"
     UI:clearUI()
     UI:addLabel("depth", "DEPTH: 0", 10, 0)
+    UI:addLabel("score", "SCORE: 0", 10, 25)
+    UI:addLabel("life", "LIVES: 3", 10, 50)
 
     levelEndTime = nil
     deathTime = nil
