@@ -97,15 +97,18 @@ function Player:eat()
         local newZoom = 2 - (self.size - 10) * (2 - 0.7) / (30 - 10)
         CAMERA:zoomTo(newZoom)
     end
-    SCORE = SCORE + math.floor(self.size / 10)
+    SCORE = SCORE + math.floor(self.size / 5)
 
     self.eatCount = self.eatCount + 1
     if self.eatCount % 5 == 0 then
         self.life = self.life + 1
     end
+    
+    SFX.playerBiteSound:play()
 end
 
 function Player:kill()
+    SFX.playerHitSound:play()
     if self.life >= 0 then
         self.life = self.life - 1
     else

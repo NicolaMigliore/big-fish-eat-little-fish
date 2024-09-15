@@ -5,6 +5,7 @@ local titleImage
 -- ui elements
 function Title:load()
     titleImage = love.graphics.newImage("assets/title.png")
+    SFX.levelMusic:play()
 end
 
 function Title:update(dt)

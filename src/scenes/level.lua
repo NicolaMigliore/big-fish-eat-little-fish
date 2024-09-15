@@ -98,6 +98,11 @@ function Level:update(dt)
         self.particles.dust:setEmissionArea("uniform",800, 700)
         self.dustParticleTimer = 2
     end
+
+    -- restart music
+    if not SFX.levelMusic:isPlaying( ) then
+		love.audio.play( SFX.levelMusic )
+	end
 end
 
 function Level:draw()
@@ -116,15 +121,14 @@ function Level:draw()
         entity:draw()
     end
 
-    -- draw spawn area
-    love.graphics.setColor(1,0.4,.6)
-    love.graphics.rectangle("line", spawnArea.x, spawnArea.y,spawnArea.w,spawnArea.h)
-    love.graphics.setColor(0.4,1,.6)
-    love.graphics.rectangle("line", safeArea.x, safeArea.y,safeArea.w,safeArea.h)
-    love.graphics.setColor(1,1,1)
+    -- -- draw spawn area
+    -- love.graphics.setColor(1,0.4,.6)
+    -- love.graphics.rectangle("line", spawnArea.x, spawnArea.y,spawnArea.w,spawnArea.h)
+    -- love.graphics.setColor(0.4,1,.6)
+    -- love.graphics.rectangle("line", safeArea.x, safeArea.y,safeArea.w,safeArea.h)
+    -- love.graphics.setColor(1,1,1)
 
     -- draw particles
-    -- love.graphics.draw(self.particles.dust, PLAYER.position.x + 20, PLAYER.position.y)
     love.graphics.draw(self.particles.dust)
 
     CAMERA:detach()

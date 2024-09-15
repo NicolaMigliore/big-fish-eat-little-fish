@@ -43,9 +43,24 @@ SCENE = "title"
 SCORE = 0
 UI = ui()
 
+SFX = {}
+
+
 function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
 
+    -- load sounds
+    SFX.buttonSound = love.audio.newSource("assets/audio/sounds/button.mp3", "static")
+    SFX.bashSound = love.audio.newSource("assets/audio/sounds/bash.mp3", "static")
+    SFX.biteSound = love.audio.newSource("assets/audio/sounds/bite.mp3", "static")
+    SFX.playerBiteSound = SFX.biteSound:clone()
+    SFX.playerHitSound = SFX.biteSound:clone()
+    SFX.playerHitSound:setPitch(0.5)
+    SFX.biteSound:setVolume(0.5)
+    SFX.biteSound:setPitch(2)
+    -- load music
+    SFX.levelMusic = love.audio.newSource("assets/audio/music/level_music.mp3", "stream")
+    
     -- load scenes
     Title:load()
     Level:load()
@@ -88,6 +103,7 @@ function love.mousereleased(x, y, button)
             if x >= btn.x and x <= btn.x + btn.width
                 and y >= btn.y and y <= btn.y + btn.height then
                 btn:onClick()
+                SFX.buttonSound:play()
                 break
             end
         end

@@ -221,6 +221,11 @@ end
 function Enemy:eat()
     self.prey = nil
     self.predator = nil
-    self.super.eat(self)
+    SFX.biteSound:play()
+    Enemy.super.eat(self)
+end
+
+function Enemy:kill()
+    Enemy.super.kill(self)
 end
 return Enemy
