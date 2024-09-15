@@ -10,7 +10,7 @@ local spawnTimer = 0
 local levelEndTime = nil
 local deathTime = nil
 local spawnArea = { x = 0, y = 0, w = 800, h = 500 }
-local safeArea = { x = 0, y = 0, w = 600, h = 200 }
+local safeArea = { x = 0, y = 0, w = 600, h = 400 }
 
 function Level:load()
 
