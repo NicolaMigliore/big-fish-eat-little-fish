@@ -9,13 +9,18 @@ local worldPadding = 40
 local spawnTimer = 0
 local levelEndTime = nil
 local deathTime = nil
-local spawnArea = { x = 0, y = 0, w = 700, h = 400 }
-local safeArea = { x = 0, y = 0, w = 100, h = 100 }
+local spawnArea = { x = 0, y = 0, w = 1000, h = 700 }
+local safeArea = { x = 0, y = 0, w = 600, h = 500 }
 
 function Level:load()
 
     -- configure map
     gameMap = sti("src/maps/map.lua")
+    
+    -- configure particles
+    self.particles = Particles()
+    self.particles:addDustParticle()
+    self.dustParticleTimer = 0
 end
 
 function Level:update(dt)
@@ -75,6 +80,16 @@ function Level:update(dt)
     if overlapTop > 0 then spawnArea.y = spawnArea.y + overlapTop end
     if overlapBottom > 0 then spawnArea.y = spawnArea.y - overlapBottom end
 
+    -- update particles
+    self.particles.dust:update(dt)
+    self.dustParticleTimer = self.dustParticleTimer - dt
+    if self.dustParticleTimer <= 0 then
+        -- self.boubleLocation = { x = self.position.x, y = self.position.y }
+        --self.particles.dust:emit(50)
+        self.particles.dust:setPosition(PLAYER.position.x, PLAYER.position.y)
+        self.particles.dust:setEmissionArea("uniform",800, 700)
+        self.dustParticleTimer = 2
+    end
 end
 
 function Level:draw()
@@ -99,6 +114,10 @@ function Level:draw()
     love.graphics.setColor(0.4,1,.6)
     love.graphics.rectangle("line", safeArea.x, safeArea.y,safeArea.w,safeArea.h)
     love.graphics.setColor(1,1,1)
+
+    -- draw particles
+    -- love.graphics.draw(self.particles.dust, PLAYER.position.x + 20, PLAYER.position.y)
+    love.graphics.draw(self.particles.dust)
 
     CAMERA:detach()
 end

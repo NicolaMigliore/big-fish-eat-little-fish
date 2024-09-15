@@ -83,7 +83,7 @@ function Fish:update(dt)
     
     -- update particles
     if self.particles then
-        for _,key in ipairs(self.particles:getKeys()) do
+        for _,key in ipairs({"boubles"}) do
             local particleSystem = self.particles[key]
             if particleSystem ~= nil then
                 particleSystem:update(dt)
@@ -122,8 +122,8 @@ function Fish:draw()
 
     
     -- draw particles
-    
-    for _,key in ipairs(self.particles:getKeys()) do
+    -- for _,key in ipairs(self.particles:getKeys()) do
+    for _,key in ipairs({"boubles"}) do 
         local particleSystem = self.particles[key]
         if particleSystem ~= nil then
             love.graphics.draw(particleSystem, self.boubleLocation.x, self.boubleLocation.y)
