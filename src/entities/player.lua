@@ -41,10 +41,10 @@ function Player:fishControl()
 
     -- set player intentions
     self.intention:setIntentions({
-        left = love.keyboard.isDown("left"),
-        right = love.keyboard.isDown("right"),
-        up = love.keyboard.isDown("up"),
-        down = love.keyboard.isDown("down")
+        left = love.keyboard.isDown(unpack(self.control.keys.left)),
+        right = love.keyboard.isDown(unpack(self.control.keys.right)),
+        up = love.keyboard.isDown(unpack(self.control.keys.up)),
+        down = love.keyboard.isDown(unpack(self.control.keys.down)),
     })
 
     -- accellerate
