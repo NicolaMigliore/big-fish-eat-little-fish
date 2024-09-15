@@ -1,7 +1,8 @@
 local Animation = Object.extend(Object)
 local AnimationController = Object.extend(Object)
 
-function Animation:new(imagePath, frames, width, height, speed, flipX, flipY)
+function Animation:new(imagePath, frames, width, height, speed, flipX, flipY, loop)
+    if loop == nil then loop = true end
     self.imagePath = imagePath
     self.frames = frames
     self.width = width or 32
@@ -9,6 +10,7 @@ function Animation:new(imagePath, frames, width, height, speed, flipX, flipY)
     self.speed = speed or 1
     self.flipX = flipX or false
     self.flipY = flipY or false
+    self.loop = loop
 end
 
 function Animation.GetFrames(image, frameCount, frameW, frameH, offsetX, offsetY)

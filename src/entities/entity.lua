@@ -22,7 +22,13 @@ function Entity:update(dt)
     if self.animationController then
         local activeAnim = self.animationController.activeAnimation
         self.animationController.currentFrame = self.animationController.currentFrame + dt * self.animationController.activeAnimation.speed
-        if self.animationController.currentFrame > #activeAnim.frames then self.animationController.currentFrame = 1 end
+        if self.animationController.currentFrame > #activeAnim.frames then
+            if activeAnim.loop then
+                self.animationController.currentFrame = 1 
+            else
+                self.animationController.currentFrame = #activeAnim.frames - 1
+            end    
+        end
     end
 
     -- update state

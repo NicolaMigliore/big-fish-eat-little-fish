@@ -3,6 +3,7 @@ local Particles = Object.extend(Object)
 -- available particle systems
 function Particles:new(type)
     self.boubles = nil
+    self.flash = nil
     self.dust = nil
 end
 
@@ -14,6 +15,22 @@ function Particles:addBoubleParticle()
     -- boubleParticles:setSpeed(0,20)
     boubleParticles:setRotation(0,100)
     self.boubles = boubleParticles
+end
+
+function Particles:addFlashParticle()
+    local flashImg = love.graphics.newImage("assets/particles/flash.png")
+    local flashQuads = {
+        love.graphics.newQuad(0,0,16,16,32,32),
+        love.graphics.newQuad(16,0,16,16,32,32),
+        love.graphics.newQuad(0,16,16,16,32,32),
+        love.graphics.newQuad(16,16,16,16,32,32),
+    }
+    local flashParticles = love.graphics.newParticleSystem(flashImg, 32)
+    flashParticles:setParticleLifetime(.1)
+    flashParticles:setLinearAcceleration(0,0)
+    flashParticles:setQuads(unpack(flashQuads))
+    flashParticles:setSizes(2)
+    self.flash = flashParticles
 end
 
 function  Particles:addDustParticle()

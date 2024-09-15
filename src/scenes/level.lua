@@ -9,7 +9,7 @@ local worldPadding = 40
 local spawnTimer = 0
 local levelEndTime = nil
 local deathTime = nil
-local spawnArea = { x = 0, y = 0, w = 1000, h = 700 }
+local spawnArea = { x = 0, y = 0, w = 800, h = 500 }
 local safeArea = { x = 0, y = 0, w = 600, h = 500 }
 
 function Level:load()
@@ -130,17 +130,8 @@ function Level:spawnSchool()
     -- distribute spawn points
     local spanwNumber = 10
     for i=1, spanwNumber do
-        local spawnX, spawnY
-        if i > spanwNumber * .3 then
-            -- spawn smaller
-            spawnX = math.random(spawnArea.x, spawnArea.x + spawnArea.w)
-            spawnY = math.random(spawnArea.y, spawnArea.y + spawnArea.h)
-        else
-            -- spawn larger
-            spawnX = 0
-            spawnY = 0
-        end
-
+        local spawnX = math.random(spawnArea.x, spawnArea.x + spawnArea.w)
+        local spawnY = math.random(spawnArea.y, spawnArea.y + spawnArea.h)
         -- shift out of safe area
         local isInSafeArea = Utils.pointToBoxCollision(spawnX, spawnY, safeArea.x, safeArea.y, safeArea.w, safeArea.h)
         if isInSafeArea and spawnX < PLAYER.position.x then
@@ -150,10 +141,15 @@ function Level:spawnSchool()
             spawnX = spawnX + math.random(safeArea.w/2, spawnArea.w/2)
         end
 
-        
-        -- spawn new fish
-        local smallFish = Enemy(nil, spawnX, spawnY, PLAYER.size - 5, "assets/sprites/fish_01.png")
-        ENTITIES[smallFish.id] = smallFish
+        if i > spanwNumber * .3 then
+            -- spawn smaller
+            local smallFish = Enemy(nil, spawnX, spawnY, PLAYER.size - 5, "assets/sprites/fish_01.png")
+            ENTITIES[smallFish.id] = smallFish
+        else
+            -- spawn larger
+            local smallFish = Enemy(nil, spawnX, spawnY, PLAYER.size + 5, "assets/sprites/fish_01.png")
+            ENTITIES[smallFish.id] = smallFish
+        end
     end
     spawnTimer = 1
 end

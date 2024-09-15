@@ -36,6 +36,7 @@ function Fish:new(id, x, y, size, spriteFileName)
     local particles = Particles()
     particles:addBoubleParticle()
     self.boubleLocation = { x = 0, y = 0}
+    particles:addFlashParticle()
 
     local position = Position(x, y)
     local entityOptions = {
@@ -68,6 +69,7 @@ function Fish:update(dt)
                 local sizeDelta = self.size - other.size
                 if sizeDelta > 0 then
                 -- if fish is larger than other
+                self.particles.flash:emit(1)
                 self:eat()
                 other:kill()
                 elseif sizeDelta < 0 then 
@@ -83,7 +85,7 @@ function Fish:update(dt)
     
     -- update particles
     if self.particles then
-        for _,key in ipairs({"boubles"}) do
+        for _,key in ipairs({"boubles","flash"}) do
             local particleSystem = self.particles[key]
             if particleSystem ~= nil then
                 particleSystem:update(dt)
@@ -123,10 +125,13 @@ function Fish:draw()
     
     -- draw particles
     -- for _,key in ipairs(self.particles:getKeys()) do
-    for _,key in ipairs({"boubles"}) do 
+    for _,key in ipairs({"boubles", "flash"}) do 
         local particleSystem = self.particles[key]
-        if particleSystem ~= nil then
+        if particleSystem ~= nil and key == "boubles" then
             love.graphics.draw(particleSystem, self.boubleLocation.x, self.boubleLocation.y)
+        end
+        if particleSystem ~= nil and key == "flash" then
+            love.graphics.draw(particleSystem, self.position.x, self.position.y)
         end
     end
 end
@@ -137,29 +142,25 @@ function Fish:createAnimationController(spr)
     local idleAnimation = Animation(spr.image, idleFrames, 32, 32, 1)
     --seek
     local seekAnimation = Animation(spr.image, idleFrames, 32, 32, 1)
-    -- swim_right
+    -- swim
     local swimFrames = Animation.GetFrames(spr.image, 4, 32, 32, 0, 68)
     local swimAnimation = Animation(spr.image, swimFrames, 32, 32, 1, false, false)
-    -- swim_right
-    local swim_rightFrames = Animation.GetFrames(spr.image, 4, 32, 32, 0, 68)
-    local swim_rightAnimation = Animation(spr.image, swim_rightFrames, 32, 32, 1, false, false)
-    -- swim_left
-    local swim_leftFrames = Animation.GetFrames(spr.image, 4, 32, 32, 0, 68)
-    local swim_leftAnimation = Animation(spr.image, swim_leftFrames, 32, 32, 1, true, false)
+    --death
+    local deathFrames = Animation.GetFrames(spr.image, 4, 32, 32, 0, 102)
+    local deathAnimation = Animation(spr.image, deathFrames, 32, 32, 1, false, false, false)
 
     local animationController = AnimationController({
         idle = idleAnimation,
         swim = swimAnimation,
-        swim_right = swim_rightAnimation,
-        swim_left = swim_leftAnimation,
         seek = seekAnimation,
+        death = deathAnimation,
     }, "idle")
     return animationController
 end
 
 function Fish:eat()
     if self.size <= 25 then
-        self.size = self.size + 2
+        self.size = self.size + 1
     end
 end
 
