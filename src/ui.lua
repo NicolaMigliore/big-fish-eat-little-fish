@@ -44,10 +44,11 @@ function UI:draw()
     end
     -- draw labels
     love.graphics.setFont(labelFont)
-    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.setColor(love.math.colorFromBytes(254,174,52))
     for key,label in pairs(self.labels) do
         love.graphics.print(label.text, label.x, label.y)
     end
+    love.graphics.setColor(1, 1, 1, 1)
 end
 
 function UI:clearUI()

@@ -132,6 +132,9 @@ function Level:draw()
     love.graphics.draw(self.particles.dust)
 
     CAMERA:detach()
+    
+    -- draw label panel
+    self:drawCountersPanel()
 end
 
 function Level:loadLevel(depth)
@@ -216,6 +219,18 @@ function Level:drawGradient()
 			love.graphics.rectangle("fill", x, y, width, height)
 		end, "linear",
 		x + height/2, y + width/2, width/2, height/2, color1, color2, math.pi/2)
+end
+
+function Level:drawCountersPanel()
+    local panelW = 200
+    local panelH = 110
+    local panelX, panelY = 5, 5
+
+    love.graphics.setColor(love.math.colorFromBytes(90, 105, 136))
+    love.graphics.rectangle("fill", panelX - 5, panelY - 5, panelW + 10, panelH + 10)
+
+    love.graphics.setColor(love.math.colorFromBytes(139, 155, 180))
+    love.graphics.rectangle("fill", panelX, panelY, panelW, panelH)
 end
 
 return Level

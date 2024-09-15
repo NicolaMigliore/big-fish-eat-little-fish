@@ -75,8 +75,6 @@ function Fish:update(dt)
                 elseif sizeDelta < 0 then 
                     other:eat()
                     self:kill()
-                else
-                    print("same size")
                 end
             end
         end

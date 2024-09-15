@@ -2,7 +2,7 @@ local Fish = require "src.entities.fish"
 local Player = Fish:extend()
 
 function Player:new(id, x, y)
-    Player.super.new(self,id, x, y, 10, "assets/sprites/fish_01.png")
+    Player.super.new(self, id, x, y, 10, "assets/sprites/fish_01.png")
 
     self.type = "player"
     self.collider:setCollisionClass("Player")
@@ -17,6 +17,7 @@ function Player:new(id, x, y)
         })
     self.life = 3
     self.eatCount = 0
+    self.invicibilityTimer = 0
 end
 
 function Player:update(dt)
@@ -26,6 +27,8 @@ function Player:update(dt)
 
     self.position.x = self.collider:getX()
     self.position.y = self.collider:getY()
+
+    if self.invicibilityTimer > 0 then self.invicibilityTimer = self.invicibilityTimer - dt end
 end
 
 function Player:draw()
@@ -103,16 +106,19 @@ function Player:eat()
     if self.eatCount % 5 == 0 then
         self.life = self.life + 1
     end
-    
+
     SFX.playerBiteSound:play()
 end
 
 function Player:kill()
-    SFX.playerHitSound:play()
-    if self.life >= 0 then
-        self.life = self.life - 1
-    else
-        self.state:setState("death", self)
+    if self.invicibilityTimer <= 0 then
+        self.invicibilityTimer = .5
+        SFX.playerHitSound:play()
+        if self.life > 1 then
+            self.life = self.life - 1
+        else
+            self.state:setState("death", self)
+        end
     end
 end
 
