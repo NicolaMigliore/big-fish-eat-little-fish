@@ -10,7 +10,7 @@ local spawnTimer = 0
 local levelEndTime = nil
 local deathTime = nil
 local spawnArea = { x = 0, y = 0, w = 800, h = 500 }
-local safeArea = { x = 0, y = 0, w = 600, h = 500 }
+local safeArea = { x = 0, y = 0, w = 600, h = 200 }
 
 function Level:load()
 
@@ -27,7 +27,12 @@ function Level:update(dt)
     WORLD:update(dt)
     -- update entities
     for _, entity in pairs(ENTITIES) do
-        entity:update(dt)
+        local playerDistance = Utils.pointDistance(PLAYER.position.x, PLAYER.position.y, entity.position.x, entity.position.y)
+        if playerDistance > 1000 then
+            entity:kill()
+        else
+            entity:update(dt)
+        end
     end
 
     -- spawn fish
@@ -56,6 +61,7 @@ function Level:update(dt)
         levelEndTime = love.timer.getTime()
     end
     if levelEndTime ~= nil and love.timer.getTime() - levelEndTime > 1.5 then
+        SCORE = SCORE + math.floor(PLAYER.position.y / 80)
         LOAD_SCENE_LEVEL_END()
     end
 
@@ -69,8 +75,8 @@ function Level:update(dt)
     end
 
     -- update spawn area
-    safeArea.x, safeArea.y = PLAYER.position.x - safeArea.w/2, PLAYER.position.y - safeArea.h/2
-    spawnArea.x, spawnArea.y = PLAYER.position.x - spawnArea.w/2, PLAYER.position.y - spawnArea.h/2
+    safeArea.x, safeArea.y = PLAYER.position.x - safeArea.w/2, PLAYER.position.y + 50 - safeArea.h/2
+    spawnArea.x, spawnArea.y = PLAYER.position.x - spawnArea.w/2, PLAYER.position.y + 100 - spawnArea.h/2
     local overlapLeft =  worldPadding - spawnArea.x
     local overlapRight = (spawnArea.x + spawnArea.w) - (WORLD_WIDTH - worldPadding)
     local overlapTop =  worldPadding - spawnArea.y
@@ -186,6 +192,7 @@ function Level:loadWorld()
 
     PLAYER = Player(nil, WORLD_WIDTH/2, 200)
     ENTITIES[PLAYER.id] = PLAYER
+    SCORE = 0
 end
 
 function Level:drawGradient()
