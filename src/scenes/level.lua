@@ -5,9 +5,12 @@ local Player = require "src.entities.player"
 local Enemy = require "src.entities.enemy"
 
 local gameMap
+local worldPadding = 40
 local spawnTimer = 0
 local levelEndTime = nil
 local deathTime = nil
+local spawnArea = { x = 0, y = 0, w = 700, h = 400 }
+local safeArea = { x = 0, y = 0, w = 100, h = 100 }
 
 function Level:load()
 
@@ -23,7 +26,7 @@ function Level:update(dt)
     end
 
     -- spawn fish
-    if Utils.tabelCount(ENTITIES) <= 10 and math.random() > .5 then
+    if Utils.tabelCount(ENTITIES) <= 20 and math.random() > .3 then
         spawnTimer = spawnTimer - dt
         if spawnTimer < 0 then
             self:spawnSchool()
@@ -59,6 +62,19 @@ function Level:update(dt)
         SCORE = SCORE + math.floor(PLAYER.position.y / 80)
         LOAD_SCENE_DEATH()
     end
+
+    -- update spawn area
+    safeArea.x, safeArea.y = PLAYER.position.x - safeArea.w/2, PLAYER.position.y - safeArea.h/2
+    spawnArea.x, spawnArea.y = PLAYER.position.x - spawnArea.w/2, PLAYER.position.y - spawnArea.h/2
+    local overlapLeft =  worldPadding - spawnArea.x
+    local overlapRight = (spawnArea.x + spawnArea.w) - (WORLD_WIDTH - worldPadding)
+    local overlapTop =  worldPadding - spawnArea.y
+    local overlapBottom = (spawnArea.y + spawnArea.h) - (WORLD_HEIGHT - worldPadding)
+    if overlapRight > 0 then spawnArea.x = spawnArea.x - overlapRight end
+    if overlapLeft > 0 then spawnArea.x = spawnArea.x + overlapLeft end
+    if overlapTop > 0 then spawnArea.y = spawnArea.y + overlapTop end
+    if overlapBottom > 0 then spawnArea.y = spawnArea.y - overlapBottom end
+
 end
 
 function Level:draw()
@@ -77,6 +93,13 @@ function Level:draw()
         entity:draw()
     end
 
+    -- draw spawn area
+    love.graphics.setColor(1,0.4,.6)
+    love.graphics.rectangle("line", spawnArea.x, spawnArea.y,spawnArea.w,spawnArea.h)
+    love.graphics.setColor(0.4,1,.6)
+    love.graphics.rectangle("line", safeArea.x, safeArea.y,safeArea.w,safeArea.h)
+    love.graphics.setColor(1,1,1)
+
     CAMERA:detach()
 end
 
@@ -85,29 +108,35 @@ function Level:loadLevel(depth)
 end
 
 function Level:spawnSchool()
-    local worldPadding = 40
-    local x,y = PLAYER.position.x, PLAYER.position.y
-    local xOffset, yOffset = 0, 0
-
-    for i=1, math.random(4,9) do
-        xOffset = 100 + math.random(200,450)
-        yOffset = 100 + math.random(100,350)
-
-        if (x + xOffset < 0 + worldPadding) or (x + xOffset > WORLD_WIDTH + worldPadding) then
-            print("out of bounds: "..(x + xOffset).." changed to: "..(x - xOffset))
-            xOffset = - xOffset
+    -- distribute spawn points
+    local spanwNumber = 10
+    for i=1, spanwNumber do
+        local spawnX, spawnY
+        if i > spanwNumber * .3 then
+            -- spawn smaller
+            spawnX = math.random(spawnArea.x, spawnArea.x + spawnArea.w)
+            spawnY = math.random(spawnArea.y, spawnArea.y + spawnArea.h)
+        else
+            -- spawn larger
+            spawnX = 0
+            spawnY = 0
         end
-        if y + yOffset > WORLD_HEIGHT + worldPadding then yOffset = - yOffset end
+
+        -- shift out of safe area
+        local isInSafeArea = Utils.pointToBoxCollision(spawnX, spawnY, safeArea.x, safeArea.y, safeArea.w, safeArea.h)
+        if isInSafeArea and spawnX < PLAYER.position.x then
+            spawnX = spawnX - math.random(safeArea.w/2, spawnArea.w/2)
+        end
+        if isInSafeArea and spawnX > PLAYER.position.x then
+            spawnX = spawnX + math.random(safeArea.w/2, spawnArea.w/2)
+        end
+
         
-        local smallFish = Enemy(nil, x + xOffset, y + yOffset, PLAYER.size - 5, "assets/sprites/fish_01.png")
+        -- spawn new fish
+        local smallFish = Enemy(nil, spawnX, spawnY, PLAYER.size - 5, "assets/sprites/fish_01.png")
         ENTITIES[smallFish.id] = smallFish
     end
-    for i=1, math.random(1,2) do
-        local largeFish = Enemy(nil, x + xOffset, y + yOffset + 300, PLAYER.size + 5, "assets/sprites/fish_01.png")
-        ENTITIES[largeFish.id] = largeFish
-    end
-    -- local spawnCounter = math.floor(math.random(5))
-    spawnTimer = 2
+    spawnTimer = 1
 end
 
 function LOAD_SCENE_LEVEL()
