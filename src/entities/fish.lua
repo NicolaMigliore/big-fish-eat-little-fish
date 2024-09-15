@@ -97,6 +97,13 @@ function Fish:update(dt)
             self.boubleTimer = math.random(1,3)
             self.boubleLocation = { x = self.position.x, y = self.position.y }
             self.particles.boubles:emit(1)
+            --play sound
+            local playerDistance = Utils.pointDistance(self.position.x, self.position.y, PLAYER.position.x, PLAYER.position.y)
+            if playerDistance < 100 then
+                local volume = 1-playerDistance/400
+                SFX.waterSound:setVolume(volume - .2)
+                SFX.waterSound:play()
+            end
         end
     end
 

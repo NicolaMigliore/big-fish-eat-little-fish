@@ -221,7 +221,12 @@ end
 function Enemy:eat()
     self.prey = nil
     self.predator = nil
-    SFX.biteSound:play()
+    local playerDistance = Utils.pointDistance(self.position.x, self.position.y, PLAYER.position.x, PLAYER.position.y)
+    if playerDistance < 400 then
+        local volume = 1-playerDistance/400
+        SFX.biteSound:setVolume(volume)
+        SFX.biteSound:play()
+    end
     Enemy.super.eat(self)
 end
 
