@@ -37,6 +37,8 @@ end
 
 function LOAD_SCENE_LEVEL_END()
     SCENE = "level_end"
+    SET_SCALE(1)
+    RESET_CAMERA()
     love.graphics.setBackgroundColor(love.math.colorFromBytes(44, 232, 245))
 
     UI:clearUI()

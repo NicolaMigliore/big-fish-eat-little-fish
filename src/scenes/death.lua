@@ -35,6 +35,8 @@ end
 
 function LOAD_SCENE_DEATH()
     SCENE = "death"
+    RESET_CAMERA()
+    SET_SCALE(1)
     love.graphics.setBackgroundColor(love.math.colorFromBytes(44, 232, 245))
 
     UI:clearUI()

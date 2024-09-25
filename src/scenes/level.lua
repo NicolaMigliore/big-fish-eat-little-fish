@@ -13,10 +13,6 @@ local spawnArea = { x = 0, y = 0, w = 800, h = 500 }
 local safeArea = { x = 0, y = 0, w = 600, h = 400 }
 
 function Level:load()
-
-    -- configure map
-    gameMap = sti("src/maps/map.lua")
-    
     -- configure particles
     self.particles = Particles()
     self.particles:addDustParticle()
@@ -27,8 +23,13 @@ function Level:update(dt)
     WORLD:update(dt)
     -- update entities
     for _, entity in pairs(ENTITIES) do
-        local playerDistance = Utils.pointDistance(PLAYER.position.x, PLAYER.position.y, entity.position.x, entity.position.y)
-        if playerDistance > 1000 then
+        local playerDistance = Utils.pointDistance(
+            PLAYER.position.x,
+            PLAYER.position.y,
+            entity.position.x,
+            entity.position.y
+        )
+        if entity.type == "enemy" and playerDistance > 1000 then
             entity:kill()
         else
             entity:update(dt)
@@ -44,24 +45,20 @@ function Level:update(dt)
     end
 
     -- update depth label
-    UI.labels.depth.text = "DEPTH:"..math.floor(PLAYER.position.y / 80)
-    UI.labels.score.text = "SCORE:"..math.floor(SCORE)
-    UI.labels.life.text = "LIVES:"..PLAYER.life
+    UI:updateLabel("depth", "DEPTH:" .. math.floor(PLAYER.position.y / 80))
+    UI:updateLabel("score", "SCORE:" .. math.floor(SCORE))
+    UI:updateLabel("life", "LIVES:" .. PLAYER.life)
 
     -- move camera
-    local camScale = 1/CAMERA.scale
-    local viewportW, viewportH = love.graphics.getWidth() * camScale, love.graphics.getHeight() * camScale
+    local viewportW, viewportH = love.graphics.getWidth() / SCALE, love.graphics.getHeight() / SCALE
     local camX, camY = PLAYER.position.x, PLAYER.position.y
-    camX = math.max(camX, 0 + viewportW / 2) -- restrict left
-    camX = math.min(camX, WORLD_WIDTH - viewportW / 2) -- restrict right
-    camY = math.max(camY, 0 + viewportH / 2) -- restrict top
+    camX = math.max(camX, viewportW / 2)                -- restrict left
+    camX = math.min(camX, WORLD_WIDTH - viewportW / 2)  -- restrict right
+    camY = math.max(camY, 0 + viewportH / 2)            -- restrict top
     camY = math.min(camY, WORLD_HEIGHT - viewportH / 2) -- restrict bottom
     CAMERA:lockPosition(camX, camY)
 
     -- end level
-    if levelEndTime == nil and PLAYER.position.y > WORLD_HEIGHT - 40 then
-        levelEndTime = love.timer.getTime()
-    end
     if levelEndTime ~= nil and love.timer.getTime() - levelEndTime > 1.5 then
         SCORE = SCORE + math.floor(PLAYER.position.y / 80)
         LOAD_SCENE_LEVEL_END()
@@ -77,11 +74,11 @@ function Level:update(dt)
     end
 
     -- update spawn area
-    safeArea.x, safeArea.y = PLAYER.position.x - safeArea.w/2, PLAYER.position.y + 50 - safeArea.h/2
-    spawnArea.x, spawnArea.y = PLAYER.position.x - spawnArea.w/2, PLAYER.position.y + 100 - spawnArea.h/2
-    local overlapLeft =  worldPadding - spawnArea.x
+    safeArea.x, safeArea.y = PLAYER.position.x - safeArea.w / 2, PLAYER.position.y + 50 - safeArea.h / 2
+    spawnArea.x, spawnArea.y = PLAYER.position.x - spawnArea.w / 2, PLAYER.position.y + 100 - spawnArea.h / 2
+    local overlapLeft = worldPadding - spawnArea.x
     local overlapRight = (spawnArea.x + spawnArea.w) - (WORLD_WIDTH - worldPadding)
-    local overlapTop =  worldPadding - spawnArea.y
+    local overlapTop = worldPadding - spawnArea.y
     local overlapBottom = (spawnArea.y + spawnArea.h) - (WORLD_HEIGHT - worldPadding)
     if overlapRight > 0 then spawnArea.x = spawnArea.x - overlapRight end
     if overlapLeft > 0 then spawnArea.x = spawnArea.x + overlapLeft end
@@ -95,26 +92,25 @@ function Level:update(dt)
         -- self.boubleLocation = { x = self.position.x, y = self.position.y }
         --self.particles.dust:emit(50)
         self.particles.dust:setPosition(PLAYER.position.x, PLAYER.position.y)
-        self.particles.dust:setEmissionArea("uniform",800, 700)
+        self.particles.dust:setEmissionArea("uniform", 800, 700)
         self.dustParticleTimer = 2
     end
 
     -- restart music
-    if not SFX.levelMusic:isPlaying( ) then
-		love.audio.play( SFX.levelMusic )
-	end
+    if not SFX.levelMusic:isPlaying() then
+        love.audio.play(SFX.levelMusic)
+    end
 end
 
 function Level:draw()
-    CAMERA:attach()
     -- draw background
     self:drawGradient()
-    love.graphics.setColor(1,1,1,1)
+    love.graphics.setColor(1, 1, 1, 1)
 
-    -- draw map
-    gameMap:drawLayer(gameMap.layers["borders"])
+    gameMap:drawLayer(gameMap.layers["background"])
+    gameMap:drawLayer(gameMap.layers["obstacles"])
 
-    -- WORLD:draw()
+    WORLD:draw()
 
     -- draw entities
     for _, entity in pairs(ENTITIES) do
@@ -130,9 +126,6 @@ function Level:draw()
 
     -- draw particles
     love.graphics.draw(self.particles.dust)
-
-    CAMERA:detach()
-    
     -- draw label panel
     self:drawCountersPanel()
 end
@@ -144,16 +137,16 @@ end
 function Level:spawnSchool()
     -- distribute spawn points
     local spanwNumber = 10
-    for i=1, spanwNumber do
+    for i = 1, spanwNumber do
         local spawnX = math.random(spawnArea.x, spawnArea.x + spawnArea.w)
         local spawnY = math.random(spawnArea.y, spawnArea.y + spawnArea.h)
         -- shift out of safe area
         local isInSafeArea = Utils.pointToBoxCollision(spawnX, spawnY, safeArea.x, safeArea.y, safeArea.w, safeArea.h)
         if isInSafeArea and spawnX < PLAYER.position.x then
-            spawnX = spawnX - math.random(safeArea.w/2, spawnArea.w/2)
+            spawnX = spawnX - math.random(safeArea.w / 2, spawnArea.w / 2)
         end
         if isInSafeArea and spawnX > PLAYER.position.x then
-            spawnX = spawnX + math.random(safeArea.w/2, spawnArea.w/2)
+            spawnX = spawnX + math.random(safeArea.w / 2, spawnArea.w / 2)
         end
 
         if i > spanwNumber * .3 then
@@ -169,65 +162,91 @@ function Level:spawnSchool()
     spawnTimer = 1
 end
 
-function LOAD_SCENE_LEVEL()
+function LOAD_SCENE_LEVEL(lvl)
+    lvl = lvl or 1
     SCENE = "level"
+    SET_SCALE(2)
     UI:clearUI()
-    UI:addLabel("depth", "DEPTH: 0", 10, 0)
-    UI:addLabel("score", "SCORE: 0", 10, 25)
-    UI:addLabel("life", "LIVES: 3", 10, 50)
+    UI:addLabel("depth", "DEPTH: 0", 10, -15)
+    UI:addLabel("score", "SCORE: 0", 10, 15)
+    UI:addLabel("life", "LIVES: 3", 10, 45)
 
     levelEndTime = nil
     deathTime = nil
-    
-    Level:loadLevel(1)
-    Level:loadWorld()
-    CAMERA = Camera(PLAYER.position.x, PLAYER.position.y, 2)
+
+    Level:loadLevel(lvl)
+    local mapNames = {"map_1.lua", "map_2.lua"}
+    local mapFileName = "map_1_tmp.lua"
+    -- if lvl > 1 then mapFileName = mapNames[math.random(1,#mapNames)] end
+    Level:loadWorld(mapFileName)
     CAMERA.smoother = CAMERA.smooth.damped(10)
 end
 
-function Level:loadWorld()
+function Level:loadWorld(mapName)
     WORLD = wf.newWorld(0, 0, true)
-    WORLD:addCollisionClass('Player')
     WORLD:addCollisionClass('Fish')
+    WORLD:addCollisionClass('Obstacle')
+    WORLD:addCollisionClass('Spawn')
+    WORLD:addCollisionClass('Trigger')
+    WORLD:addCollisionClass('Player', { ignores = { 'Trigger', 'Spawn' } })
 
-    local worldBounds = {
-        top = WORLD:newRectangleCollider(0, -10, WORLD_WIDTH, 10),
-        right = WORLD:newRectangleCollider(WORLD_WIDTH -16, 0, 16, WORLD_HEIGHT),
-        bottom = WORLD:newRectangleCollider(0, WORLD_HEIGHT - 16, WORLD_WIDTH, 16),
-        left = WORLD:newRectangleCollider(0, 0, 16, WORLD_HEIGHT),
-    }
+    -- configure map
+    gameMap = sti("src/maps/"..mapName)
+    WORLD_WIDTH, WORLD_HEIGHT = gameMap.width * gameMap.tilewidth, gameMap.height * gameMap.tileheight
+    -- local worldBounds = {
+    --     top = WORLD:newRectangleCollider(0, -10, WORLD_WIDTH, 10),
+    --     right = WORLD:newRectangleCollider(WORLD_WIDTH -16, 0, 16, WORLD_HEIGHT),
+    --     bottom = WORLD:newRectangleCollider(0, WORLD_HEIGHT - 16, WORLD_WIDTH, 16),
+    --     left = WORLD:newRectangleCollider(0, 0, 16, WORLD_HEIGHT),
+    -- }
+    local worldColliders = gameMap.objects
+    for i, obj in pairs(worldColliders) do
+        if obj ~= nil then
+            local collider = WORLD:newRectangleCollider(obj.x, obj.y, obj.width, obj.height)
+            collider:setType("static")
+            if obj.type == "obstacle" or obj.type == "world_border" then
+                collider:setCollisionClass("Obstacle")
+            elseif obj.type == "trigger" and obj.name == "level_exit" then
+                collider:setCollisionClass("Trigger")
 
-    for key, collider in pairs(worldBounds) do
-        collider:setType("static")
+                local endTrigger = Trigger(collider:getX(), collider:getY(), collider,
+                    function(trigger, other)
+                        -- LOAD_SCENE_LEVEL_END()
+                        levelEndTime = love.timer.getTime()
+                    end)
+                ENTITIES[endTrigger.id] = endTrigger
+            elseif obj.type == "spawn" and obj.name == "player_spawn" then
+                collider:setCollisionClass("Spawn")
+                PLAYER = Player(nil, collider:getX(), collider:getY())
+                ENTITIES[PLAYER.id] = PLAYER
+            end
+        end
     end
-
-    PLAYER = Player(nil, WORLD_WIDTH/2, 200)
-    ENTITIES[PLAYER.id] = PLAYER
     SCORE = 0
 end
 
 function Level:drawGradient()
     -- Rectangle with linear gradient
-    local color1 = {44/255, 232/255, 245/255, 1}
-    local color2 = {18/255, 78/255, 137/255, 1}
+    local color1 = { 44 / 255, 232 / 255, 245 / 255, 1 }
+    local color2 = { 18 / 255, 78 / 255, 137 / 255, 1 }
 
     local x, y = 0, 0
     local width, height = WORLD_HEIGHT, WORLD_WIDTH
 
-	love.gradient.draw(
-		function()
-			love.graphics.rectangle("fill", x, y, width, height)
-		end, "linear",
-		x + height/2, y + width/2, width/2, height/2, color1, color2, math.pi/2)
+    love.gradient.draw(
+        function()
+            love.graphics.rectangle("fill", x, y, width, height)
+        end, "linear",
+        x + height / 2, y + width / 2, width / 2, height / 2, color1, color2, math.pi / 2)
 end
 
 function Level:drawCountersPanel()
-    local panelW = 200
-    local panelH = 110
-    local panelX, panelY = 5, 5
+    local panelW = 100
+    local panelH = 50
+    local panelX, panelY = CAMERA:worldCoords(5, 5)
 
     love.graphics.setColor(love.math.colorFromBytes(90, 105, 136))
-    love.graphics.rectangle("fill", panelX - 5, panelY - 5, panelW + 10, panelH + 10)
+    love.graphics.rectangle("fill", panelX - 3, panelY - 3, panelW + 6, panelH + 6)
 
     love.graphics.setColor(love.math.colorFromBytes(139, 155, 180))
     love.graphics.rectangle("fill", panelX, panelY, panelW, panelH)

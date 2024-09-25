@@ -14,7 +14,7 @@ function UI:new()
 end
 
 function UI:update(dt)
-    local windowCenter = { x = love.graphics:getWidth() / 2, y = love.graphics:getHeight() / 2 }
+    local windowCenter = { x = BASE_WIDTH/2, y = BASE_HEIGHT/2 }
     -- update layout
     for _, btn in pairs(self.buttons) do
         btn.x = windowCenter.x - btn.width / 2
@@ -61,6 +61,11 @@ end
 
 function UI:addLabel(key, text, x, y)
     self.labels[key] = {x = x, y = y, text = text}
+end
+function UI:updateLabel(key, newLabel)
+    if self.labels[key] ~= nil then
+        self.labels[key].text = newLabel
+    end
 end
 
 

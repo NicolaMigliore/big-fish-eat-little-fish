@@ -97,8 +97,8 @@ end
 function Player:eat()
     if self.size <= 20 then
         self.size = self.size + 1
-        local newZoom = 2 - (self.size - 10) * (2 - 0.7) / (30 - 10)
-        CAMERA:zoomTo(newZoom)
+        -- local newZoom = (2 - (self.size - 10) * (2 - 0.7) / (30 - 10)) * SCALE
+        -- CAMERA:zoomTo(newZoom)
     end
     SCORE = SCORE + math.floor(self.size / 5)
 
