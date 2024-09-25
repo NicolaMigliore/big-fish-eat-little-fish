@@ -11,7 +11,6 @@ function Fish:new(id, x, y, size, spriteFileName)
     -- self.strength = 500 + 100 / self.size
     self.strength = 400 + 200 / self.size
     self.maxSpeed = 450 + 250 / self.size 
-    local spr = Sprite(spriteFileName)
 
     -- configure collider
     local collider = WORLD:newRectangleCollider(x - 16, y - 8, 32 * self.size / 10, 16 * self.size / 10)
@@ -25,8 +24,9 @@ function Fish:new(id, x, y, size, spriteFileName)
     -- local control = Control()
     local intention = Intention()
 
+    local sprite = Sprite(spriteFileName)
     -- define animations
-    local animationController = self:createAnimationController(spr)
+    local animationController = self:createAnimationController(sprite)
 
     -- define states
     local state = self:createState()
@@ -41,6 +41,7 @@ function Fish:new(id, x, y, size, spriteFileName)
     local position = Position(x, y)
     local entityOptions = {
         position = position,
+        sprite = sprite,
         collider = collider,
         -- control = control,
         intention = intention,
@@ -48,7 +49,7 @@ function Fish:new(id, x, y, size, spriteFileName)
         state = state,
         particles = particles,
     }
-    Fish.super.new(self, id, "fish", spr, entityOptions)
+    Fish.super.new(self, id, "fish", entityOptions)
 end
 
 function Fish:update(dt)

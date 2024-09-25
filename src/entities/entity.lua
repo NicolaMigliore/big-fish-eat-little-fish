@@ -2,12 +2,11 @@ local Entity = Object.extend(Object)
 
 --- New Entity Constructor
 ---@diagnostic disable-next-line: undefined-doc-name
----@param sprite Sprite entity sprite data
 ---@param options table table of components to add to the entity
-function Entity:new(id, type, sprite, options)
+function Entity:new(id, type, options)
     self.id = id or Utils:uuid()
     self.type = type
-    self.sprite = sprite
+    self.sprite = options.sprite
     self.position = options.position
     self.collider = options.collider
     self.control = options.control
