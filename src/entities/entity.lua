@@ -6,6 +6,7 @@ local Entity = Object.extend(Object)
 function Entity:new(id, type, options)
     self.id = id or Utils:uuid()
     self.type = type
+    self.scale = options.scale or 1
     self.sprite = options.sprite
     self.position = options.position
     self.collider = options.collider
@@ -41,8 +42,8 @@ function Entity:draw()
     if self.animationController and self.animationController.activeAnimation and self.position then 
         local activeAnim = self.animationController.activeAnimation
         local frameToDraw = activeAnim.frames[math.floor(self.animationController.currentFrame)]
-        local scaleX = (activeAnim.flipX or self.position.dx < 0) and -1 or 1
-        local scaleY = activeAnim.flipY and -1 or 1
+        local scaleX = (activeAnim.flipX or self.position.dx < 0) and -self.scale or self.scale
+        local scaleY = activeAnim.flipY and -self.scale or self.scale
         love.graphics.draw(
             self.sprite.image,
             frameToDraw,

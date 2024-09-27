@@ -3,10 +3,10 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "maps/map_1_tmp.tmx",
+    "activeFile": "maps/map_3.tmx",
     "expandedProjectPaths": [
-        "maps",
-        "."
+        ".",
+        "maps"
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
@@ -18,8 +18,8 @@
             "scale": 1,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 208,
-                "y": 114
+                "x": 255.5,
+                "y": 127
             }
         },
         "C:/Users/Nick/Documents/MyProjects/love-tiled-map-test/small_map.tmx#Wooden_House_Walls_Tilset": {
@@ -46,27 +46,64 @@
                 2
             ],
             "scale": 0.33,
-            "selectedLayer": 1,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 639.3939393939394,
-                "y": 1121.212121212121
+                "x": 719.6969696969697,
+                "y": 2824.242424242424
+            }
+        },
+        "maps/map_2.tmx": {
+            "expandedObjectLayers": [
+                3,
+                2
+            ],
+            "scale": 4,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 683.125,
+                "y": 3833.75
+            }
+        },
+        "maps/map_2.tmx#bigFish": {
+            "scaleInDock": 1
+        },
+        "maps/map_3.tmx": {
+            "expandedObjectLayers": [
+                3,
+                2
+            ],
+            "scale": 0.5,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 677,
+                "y": 690
             }
         },
         "maps/map_tileset.tsx": {
             "scaleInDock": 1.5,
             "scaleInEditor": 1
+        },
+        "maps/ocean_tileset.tsx": {
+            "scaleInDock": 1.5,
+            "scaleInEditor": 1
         }
     },
-    "last.exportedFilePath": "C:/Users/Nick/Documents/MyProjects/love-tiled-map-test",
+    "last.exportedFilePath": "C:/Users/Nick/Documents/MyProjects/big-fish-eat-little-fish/src/maps",
     "last.imagePath": "C:/Users/Nick/Documents/MyProjects/big-fish-eat-little-fish/assets",
-    "map.lastUsedExportFilter": "All Files (*)",
+    "map.height": 120,
+    "map.lastUsedExportFilter": "File Lua (*.lua)",
     "map.lastUsedFormat": "tmx",
+    "map.width": 80,
     "openFiles": [
-        "C:/Users/Nick/Documents/MyProjects/love-tiled-map-test/small_map.tmx",
-        "maps/map_1_tmp.tmx"
+        "maps/map_2.tmx",
+        "maps/map_3.tmx",
+        "maps/ocean_tileset.tsx"
     ],
     "project": "big-fish-eat-little-fish.tiled-project",
     "recentFiles": [
+        "maps/map_2.tmx",
+        "maps/ocean_tileset.tsx",
+        "maps/map_3.tmx",
         "C:/Users/Nick/Documents/MyProjects/love-tiled-map-test/small_map.tmx",
         "maps/map_1_tmp.tmx",
         "maps/map_1.tmx",

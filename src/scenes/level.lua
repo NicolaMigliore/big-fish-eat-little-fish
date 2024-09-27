@@ -107,8 +107,15 @@ function Level:draw()
     self:drawGradient()
     love.graphics.setColor(1, 1, 1, 1)
 
-    gameMap:drawLayer(gameMap.layers["background"])
-    gameMap:drawLayer(gameMap.layers["obstacles"])
+    if gameMap.layers["background_1"] then
+        gameMap:drawLayer(gameMap.layers["background_1"])
+    end
+    if gameMap.layers["background_2"] then
+        gameMap:drawLayer(gameMap.layers["background_2"])
+    end
+    if gameMap.layers["obstacles"] then
+        gameMap:drawLayer(gameMap.layers["obstacles"])
+    end
 
     WORLD:draw()
 
@@ -165,7 +172,7 @@ end
 function LOAD_SCENE_LEVEL(lvl)
     lvl = lvl or 1
     SCENE = "level"
-    SET_SCALE(2)
+    SET_SCALE(4)
     UI:clearUI()
     UI:addLabel("depth", "DEPTH: 0", 10, -15)
     UI:addLabel("score", "SCORE: 0", 10, 15)
@@ -176,7 +183,7 @@ function LOAD_SCENE_LEVEL(lvl)
 
     Level:loadLevel(lvl)
     local mapNames = {"map_1.lua", "map_2.lua"}
-    local mapFileName = "map_1_tmp.lua"
+    local mapFileName = "map_3.lua"
     -- if lvl > 1 then mapFileName = mapNames[math.random(1,#mapNames)] end
     Level:loadWorld(mapFileName)
     CAMERA.smoother = CAMERA.smooth.damped(10)

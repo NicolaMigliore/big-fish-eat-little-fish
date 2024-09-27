@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="40" height="120" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="7">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="40" height="120" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="12">
  <editorsettings>
   <export target="../../src/maps/map_1_tmp.lua" format="lua"/>
  </editorsettings>
@@ -128,7 +128,7 @@
 9,0,0,9,0,0,0,0,0,0,9,0,0,0,9,0,9,0,0,0,0,9,0,0,9,0,0,0,0,0,0,9,0,0,0,9,0,9,0,0
 </data>
  </layer>
- <layer id="1" name="obstacles" width="40" height="120">
+ <layer id="1" name="obstacles" width="40" height="120" locked="1">
   <data encoding="csv">
 2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,
 3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,
@@ -252,11 +252,16 @@
 22,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,23,32,33,30,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,28
 </data>
  </layer>
- <objectgroup id="2" name="walls" locked="1">
+ <objectgroup id="2" name="walls">
   <object id="1" type="obstacle" x="0" y="0" width="20" height="3810"/>
   <object id="2" type="obstacle" x="1260" y="0" width="20" height="3810"/>
   <object id="3" type="obstacle" x="20" y="0" width="1240" height="8"/>
   <object id="4" type="obstacle" x="0" y="3810" width="1280" height="9.8125"/>
+  <object id="7" x="20.6667" y="2211.92" width="865.068" height="43.75"/>
+  <object id="8" x="842" y="1969.33" width="44.0909" height="242.485"/>
+  <object id="9" x="466.03" y="1923.99" width="413.909" height="43.7689"/>
+  <object id="10" x="20" y="3171.93" width="187.924" height="43.9034"/>
+  <object id="11" x="304.091" y="3172" width="955.837" height="43.8125"/>
  </objectgroup>
  <objectgroup id="3" name="triggers" locked="1">
   <object id="5" name="level_exit" type="trigger" x="608" y="3797.43" width="64" height="12"/>
